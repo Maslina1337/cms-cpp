@@ -19,6 +19,6 @@ struct PureShape {
 template<typename type>
 struct PureShapeLayer {
 	const int size;
-	const int* const angles;
+	const float* const angles;
 	const type* const pureShapes;
 };

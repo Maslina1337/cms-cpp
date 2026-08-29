@@ -9,11 +9,11 @@ const string shapesNames[shapesSize] = { "nose" };
 
 const int shapeNoseVerticalSize = 2;
 
-const int shapeNoseVerticalLayers[shapeNoseVerticalSize] = { 0.0, 1.0 };
+const float shapeNoseVerticalLayers[shapeNoseVerticalSize] = { 0.0, 1.0 };
 
 const int shapeNoseVertical0HorizontalSize = 2;
 
-const int shapeNoseVertical0HorizontalLayers[shapeNoseVertical0HorizontalSize] = { 0.0, 0.5 };
+const float shapeNoseVertical0HorizontalLayers[shapeNoseVertical0HorizontalSize] = { 0.0, 0.5 };
 
 PureShape shapeNoseVertical0Horizontal0PureShape = {
         .locs = {float2(0.1666666716337204, 0.3333333432674408), float2(0.3333333432674408, 0.3333333432674408), float2(0.3333333432674408, 0.1666666716337204), float2(0.1666666716337204, 0.1666666716337204)},
@@ -45,7 +45,7 @@ PureShapeLayer<PureShape*> shapeNoseVertical0HorizontalPureShapesWrapped = { .si
 
 const int shapeNoseVertical180HorizontalSize = 2;
 
-const int shapeNoseVertical180HorizontalLayers[shapeNoseVertical180HorizontalSize] = { 0.0, 0.5 };
+const float shapeNoseVertical180HorizontalLayers[shapeNoseVertical180HorizontalSize] = { 0.0, 0.5 };
 
 PureShape shapeNoseVertical180Horizontal0PureShape = {
         .locs = {float2(0.6666666269302368, 0.3333333432674408), float2(0.8333333730697632, 0.3333333432674408), float2(0.8333333730697632, 0.1666666716337204), float2(0.6666666865348816, 0.1666666716337204)},

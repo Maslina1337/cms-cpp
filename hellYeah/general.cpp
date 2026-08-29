@@ -4,7 +4,7 @@
 float Tick(float* expCoefficients, int expCoefficientsSize, float v, float h) { CMS::Tick(v, h); return v; };
 
 namespace CMS {
-	void getNeighborsIndices(int& prevIndex, int& nextIndex, const float ofAngle, const int* inAngles, const int inAnglesSize, const bool isSeamless) {
+	void getNeighborsIndices(int& prevIndex, int& nextIndex, const float ofAngle, const float* inAngles, const int inAnglesSize, const bool isSeamless) {
 		bool isAnyPrevFound = false;
 		bool isAnyNextFound = false;
 
@@ -98,7 +98,7 @@ namespace CMS {
 
 			// Vertical layer
 			const int verticalLayerSize = pureShapes[sIndex].size;
-			const int* verticalLayerAngles = pureShapes[sIndex].angles;
+			const float* verticalLayerAngles = pureShapes[sIndex].angles;
 
 			int prevIndexV;
 			int nextIndexV;
@@ -106,7 +106,7 @@ namespace CMS {
 
 			// Horizontal layer (lower)
 			const int horizontalLayerLowerSize = pureShapes[sIndex].pureShapes[prevIndexV].size;
-			const int* horizontalLayerLowerAngles = pureShapes[sIndex].pureShapes[prevIndexV].angles;
+			const float* horizontalLayerLowerAngles = pureShapes[sIndex].pureShapes[prevIndexV].angles;
 
 			int prevIndexHL;
 			int nextIndexHL;
@@ -114,7 +114,7 @@ namespace CMS {
 
 			// Horizontal layer (higher)
 			const int horizontalLayerHigherSize = pureShapes[sIndex].pureShapes[nextIndexV].size;
-			const int* horizontalLayerHigherAngles = pureShapes[sIndex].pureShapes[nextIndexV].angles;
+			const float* horizontalLayerHigherAngles = pureShapes[sIndex].pureShapes[nextIndexV].angles;
 
 			int prevIndexHH;
 			int nextIndexHH;
