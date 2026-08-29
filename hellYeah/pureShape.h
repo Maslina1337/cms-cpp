@@ -14,7 +14,6 @@ struct PureShape {
 	float opacity;
 	float fadeoutAngle;
 	float fadeoutLength;
-	//int vertsInterMaxSize;
 };
 
 template<typename type>

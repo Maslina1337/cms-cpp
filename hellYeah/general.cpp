@@ -1,10 +1,10 @@
-#include "pch.h"
+//#include "pch.h"
 #include "general.h"
 
 float Tick(float* expCoefficients, int expCoefficientsSize, float v, float h) { CMS::Tick(v, h); return v; };
 
 namespace CMS {
-	void getNeighborsIndices(int& prevIndex, int& nextIndex, const float ofAngle, const int* inAngles, const int inAnglesSize, const bool isSeamless = true) {
+	void getNeighborsIndices(int& prevIndex, int& nextIndex, const float ofAngle, const int* inAngles, const int inAnglesSize, const bool isSeamless) {
 		bool isAnyPrevFound = false;
 		bool isAnyNextFound = false;
 
