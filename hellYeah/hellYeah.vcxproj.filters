@@ -18,9 +18,6 @@
     <ClCompile Include="general.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
-    <ClCompile Include="segment.cpp">
-      <Filter>Исходные файлы</Filter>
-    </ClCompile>
     <ClCompile Include="shape.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>

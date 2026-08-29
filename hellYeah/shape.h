@@ -73,7 +73,7 @@ private:
 
 	bool isVertHigherThanLine(const float2& lineVert1, const float2& lineVert2, const float2& sideVert) const;
 
-	uint8_t getProperExp(const float2& lineVert1, const float2& lineVert2, const float2& sideVert, const int expressionIndexFit, const int expressionIndexOtherwise);
+	uint8_t getProperExp(const float2& lineVert1, const float2& lineVert2, const float2& sideVert, const uint8_t expressionIndexFit, const uint8_t expressionIndexOtherwise);
 
 	// TODO: vert1 is useless in segments next to first one.
 	void lineDefine(

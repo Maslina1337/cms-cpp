@@ -44,9 +44,6 @@
     <ClCompile Include="..\hellYeah\general.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
-    <ClCompile Include="..\hellYeah\segment.cpp">
-      <Filter>Исходные файлы</Filter>
-    </ClCompile>
     <ClCompile Include="..\hellYeah\shape.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>

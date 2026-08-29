@@ -112,8 +112,6 @@ Shape::Shape(PureShape ps) {
 	if (vertsIn.size() + vertsOut.size() != vertsSize) cout << "PIZDA" << endl;
 	//if (linesIn.size() + linesOut.size() + linesBetween.size() != linesSize) cout << "PIZDA" << endl;
 
-	const int a = locsSize;
-
 	vector<float2> verts = vertsIn;
 	verts.reserve(vertsSize);
 	verts.insert(verts.end(), vertsOut.begin(), vertsOut.end());
@@ -126,10 +124,10 @@ Shape::Shape(PureShape ps) {
 	vector<lineExpressioned> lines;
 	lines.resize(linesSize);
 
-	for (int i = 0; i < linesSize; i++) {
+	for (uint8_t i = 0; i < linesSize; i++) {
 		lines[i] = {
-			.from = linesRouglyGlued[i].from + (linesRouglyGlued[i].fromType == VERT_TYPE::OUT) * int(vertsIn.size()),
-			.to = linesRouglyGlued[i].to + (linesRouglyGlued[i].toType == VERT_TYPE::OUT) * int(vertsIn.size()),
+			.from = linesRouglyGlued[i].from + (linesRouglyGlued[i].fromType == VERT_TYPE::OUT) * uint8_t(vertsIn.size()),
+			.to = linesRouglyGlued[i].to + (linesRouglyGlued[i].toType == VERT_TYPE::OUT) * uint8_t(vertsIn.size()),
 			.expressionIndex = getProperExp(verts[lines[i].from], verts[lines[i].to],
 			linesRouglyGlued[i].sideVert, linesRouglyGlued[i].expressionIndexFit, linesRouglyGlued[i].expressionIndexOtherwise)
 		};
@@ -138,14 +136,14 @@ Shape::Shape(PureShape ps) {
 	cout << "expressionsCoefficients" << endl;
 	for (uint8_t i = 0; i < expressionSize; i++) {
 		cout << i << ". \t";
-		for (int j = 0; j < 10; j++) cout << expressionsCoefficients[i][j] << " \t";
+		for (uint8_t j = 0; j < 10; j++) cout << expressionsCoefficients[i][j] << " \t";
 		cout << endl;
 	}
 
 	cout << "expressionsSelection" << endl;
 	for (uint8_t i = 0; i < expressionSize; i++) {
 		cout << i << ". \t";
-		for (int j = 0; j < 10; j++) cout << expressionsSelection[i][j] << " \t";
+		for (uint8_t j = 0; j < 10; j++) cout << expressionsSelection[i][j] << " \t";
 		cout << endl;
 	}
 };
@@ -173,7 +171,7 @@ bool Shape::isVertHigherThanLine(const float2& lineVert1, const float2& lineVert
 }
 
 
-uint8_t Shape::getProperExp(const float2& lineVert1, const float2& lineVert2, const float2& sideVert, const int expressionIndexFit, const int expressionIndexOtherwise) {
+uint8_t Shape::getProperExp(const float2& lineVert1, const float2& lineVert2, const float2& sideVert, const uint8_t expressionIndexFit, const uint8_t expressionIndexOtherwise) {
 	return isVertOnLeftOfLine(lineVert1, lineVert2, sideVert) ? expressionIndexFit : expressionIndexOtherwise;
 }
 

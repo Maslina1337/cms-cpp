@@ -162,7 +162,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\hellYeah\general.cpp" />
-    <ClCompile Include="..\hellYeah\segment.cpp" />
     <ClCompile Include="..\hellYeah\shape.cpp" />
     <ClCompile Include="dllmain.cpp" />
   </ItemGroup>
