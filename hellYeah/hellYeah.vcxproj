@@ -18,6 +18,19 @@
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="general.cpp" />
+    <ClCompile Include="segment.cpp" />
+    <ClCompile Include="shape.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="float2.h" />
+    <ClInclude Include="general.h" />
+    <ClInclude Include="pureShape.h" />
+    <ClInclude Include="segment.h" />
+    <ClInclude Include="shape.h" />
+    <ClInclude Include="shapes.h" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>18.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>

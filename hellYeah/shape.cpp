@@ -6,10 +6,8 @@
 #define SEGMENT_MEMBERS_THIEF \
 expressionsSelection.push_back(segment.expressionSelection); \
 expressionsCoefficients.push_back(segment.expressionCoefficients); \
-array<float2, 3> vertsInS = segment.vertsIn; \
-bool isVertsInSTriple = segment.isVertsInTriple; \
-array<float2, 3> vertsOutS = segment.vertsOut; \
-bool isVertsOutSTriple = segment.isVertsOutTriple; \
+array<float2, int(3)> vertsInS = segment.vertsIn; \
+array<float2, 3> vertsOutS = segment.vertsOut;
 ////
 
 template<typename type, int s1, int s2>
@@ -38,9 +36,9 @@ void combine3Arrays(array<type, s1 + s2 + s3>& toArray, array<type, s1> a1, arra
 	}
 };
 
-template<bool isCyclic>
-Shape<isCyclic>::Shape(const PureShape ps) {
-	this.sourcePureShape = ps;
+
+Shape::Shape(const PureShape ps) {
+	sourcePureShape = ps;
 
 	const int locsSize = ps.locs.size();
 	const int locsMiddlesSize = ps.locsMiddles.size();
@@ -53,11 +51,11 @@ Shape<isCyclic>::Shape(const PureShape ps) {
 	locsMiddlesFadeout[0] = locsMiddlesFadeout[0] + shift;
 
 	//// Fadeout verts define.
-	for (int i = 1; i < locsMiddlesSize - isCyclic; i++) {
-		locsMiddlesFadeout[i]((ps.locsMiddles[i] - ps.locsMiddles[i - 1])* ps.fadeoutScales[i - 1] + locsMiddlesFadeout[i - 1]);
+	for (int i = 1; i < locsMiddlesSize - ps.isCyclic; i++) {
+		locsMiddlesFadeout[i] = ((ps.locsMiddles[i] - ps.locsMiddles[i - 1])* ps.fadeoutScales[i - 1] + locsMiddlesFadeout[i - 1]);
 	}
 
-	if constexpr (isCyclic) {
+	if (ps.isCyclic) {
 		locsFadeout[0] = (ps.locs[0] - ps.locsMiddles[locsSize - 1]) * ps.fadeoutScales[locsSize - 1] + locsMiddlesFadeout[locsSize - 1];
 		for (int i = 1; i < locsSize; i++) {
 			locsFadeout[i - 1] = (ps.locs[i - 1] - ps.locsMiddles[i]) * ps.fadeoutScales[i] + locsMiddlesFadeout[i];
@@ -78,28 +76,31 @@ Shape<isCyclic>::Shape(const PureShape ps) {
 	//// Creating segments
 
 	// First segment.
-	if constexpr (not isCyclic) {
-		Segment<true> segment = Segment<true>(
+	if (not ps.isCyclic) {
+		Segment<false> s = {
 			{ (ps.locsMiddles[0] - ps.locs[0]).getNormalized() * 2 + ps.locs[0], ps.locsMiddles[0] },
 			{ (locsMiddlesFadeout[0] - locsFadeout[0]).getNormalized() * 2 + locsFadeout[0], locsMiddlesFadeout[0] }
-		);
+		};
 
-		SEGMENT_MEMBERS_THIEF;
+		//SEGMENT_MEMBERS_THIEF;
 
-		lineDefine(vertsInS[0], vertsInS[1], &vertsIn, linesIn, vertsOutS[1], VERT_TYPE::IN, 2, 1, leftestVertX, defaultExpressionIndex, true);
-		lineDefine(vertsOutS[0], vertsOutS[1], &vertsOut, linesOut, vertsInS[1], VERT_TYPE::OUT, 2, 0, leftestVertX, defaultExpressionIndex, true);
-		lineBetweenDefine(vertsIn.size() - 2, vertsOut.size() - 2, *vertsIn, *vertsOut, linesBetween, vertsInS[1], 2, locsSize + 1);
-		lineBetweenDefine(vertsIn.size() - 1, vertsOut.size() - 1, *vertsIn, *vertsOut, linesBetween, vertsInS[0], 2, 3);
+		lineDefine(s.vertsIn[0], vertsInS[1], &vertsIn, linesIn, vertsOutS[1], VERT_TYPE::IN, 2, 1, leftestVertX, defaultExpressionIndex, true);
+		lineDefine(s.vertsOut[0], vertsOutS[1], &vertsOut, linesOut, vertsInS[1], VERT_TYPE::OUT, 2, 0, leftestVertX, defaultExpressionIndex, true);
+		lineBetweenDefine(vertsIn.size() - 2, vertsOut.size() - 2, &vertsIn, &vertsOut, linesBetween, vertsInS[1], 2, locsSize + 1);
+		lineBetweenDefine(vertsIn.size() - 1, vertsOut.size() - 1, &vertsIn, &vertsOut, linesBetween, vertsInS[0], 2, 3);
 	}
 
 	// Arc segments
-	for (uint8_t arcIndex = not isCyclic; arcIndex < locsSize + (not isCyclic); arcIndex++) {
+	for (uint8_t arcIndex = not ps.isCyclic; arcIndex < locsSize + (not ps.isCyclic); arcIndex++) {
 		Segment<true> segment = Segment<true>(
-			{ ps.locsMiddles[arcIndex - 1], ps.locs[arcIndex - (not isCyclic)], ps.locsMiddles[arcIndex] },
-			{ locsMiddlesFadeout[arcIndex - 1], locsFadeout[arcIndex - (not isCyclic)], locsMiddlesFadeout[arcIndex] }
+			{ ps.locsMiddles[arcIndex - 1], ps.locs[arcIndex - (not ps.isCyclic)], ps.locsMiddles[arcIndex] },
+			{ locsMiddlesFadeout[arcIndex - 1], locsFadeout[arcIndex - (not ps.isCyclic)], locsMiddlesFadeout[arcIndex] }
 		);
 
 		SEGMENT_MEMBERS_THIEF;
+
+		bool isVertsInSTriple = segment.isVertsInTriple;
+		bool isVertsOutSTriple = segment.isVertsOutTriple;
 
 		// Defining lines.
 		lineDefine(vertsInS[0], vertsInS[1], &vertsIn, linesIn, vertsOutS[1], VERT_TYPE::IN, arcIndex + 2, 0, leftestVertX, defaultExpressionIndex, arcIndex == 0);
@@ -114,7 +115,7 @@ Shape<isCyclic>::Shape(const PureShape ps) {
 	}
 
 	// Last segment.
-	if constexpr (not isCyclic) {
+	if constexpr (not ps.isCyclic) {
 		Segment<true> segment = Segment<true>(
 			{ ps.locsMiddles[locsMiddlesSize - 1], (ps.locsMiddles[-1] - ps.locs[-1]).getNormalized() * 2 + ps.locs[locsSize - 1] },
 			{ locsMiddlesFadeout[locsMiddlesSize - 1], (locsMiddlesFadeout[-1] - locsFadeout[-1]).getNormalized() * 2 + locsFadeout[locsSize - 1] }
@@ -129,9 +130,9 @@ Shape<isCyclic>::Shape(const PureShape ps) {
 	////
 
 	// If it's not then u're an idiot :)
-	vertsSize = 3 * locsSize + (not isCyclic) * 6;
-	linesSize = 4 * locsSize + (not isCyclic) * 7;
-	expressionSize = locsSize + 2 + (not isCyclic) * 2;
+	vertsSize = 3 * locsSize + (not ps.isCyclic) * 6;
+	linesSize = 4 * locsSize + (not ps.isCyclic) * 7;
+	expressionSize = locsSize + 2 + (not ps.isCyclic) * 2;
 
 	array<float2, vertsSize> verts;
 	combine2Arrays<float2, vertsIn.size(), vertsOut.size()>(verts, vertsIn, vertsOut);
@@ -173,8 +174,8 @@ Shape<isCyclic>::Shape(const PureShape ps) {
 	}
 };
 
-template<bool isCyclic>
-bool Shape<isCyclic>::isVertOnLeftOfLine(const float2& lineVert1, const float2& lineVert2, const float2& sideVert) const {
+
+bool Shape::isVertOnLeftOfLine(const float2& lineVert1, const float2& lineVert2, const float2& sideVert) const {
 	float2 fromTo = lineVert1.x < lineVert2.x ? lineVert2 - lineVert1 : lineVert1 - lineVert2;
 	if (fromTo.y > 0.00001) {
 		const float ctan = fromTo.x / fromTo.y;
@@ -184,8 +185,8 @@ bool Shape<isCyclic>::isVertOnLeftOfLine(const float2& lineVert1, const float2& 
 	else return sideVert.x < lineVert1.x;
 }
 
-template<bool isCyclic>
-bool Shape<isCyclic>::isVertHigherThanLine(const float2& lineVert1, const float2& lineVert2, const float2& sideVert) const {
+
+bool Shape::isVertHigherThanLine(const float2& lineVert1, const float2& lineVert2, const float2& sideVert) const {
 	float2 fromTo = lineVert1.x < lineVert2.x ? lineVert2 - lineVert1 : lineVert1 - lineVert2;
 	if (fromTo.x > 0.00001) {
 		const float tan = fromTo.y / fromTo.x;
@@ -195,13 +196,12 @@ bool Shape<isCyclic>::isVertHigherThanLine(const float2& lineVert1, const float2
 	else return sideVert.y > lineVert1.y;
 }
 
-template<bool isCyclic>
-int Shape<isCyclic>::getProperExp(const float2& lineVert1, const float2& lineVert2, const float2& sideVert, const int expressionIndexFit, const int expressionIndexOtherwise) {
+
+int Shape::getProperExp(const float2& lineVert1, const float2& lineVert2, const float2& sideVert, const int expressionIndexFit, const int expressionIndexOtherwise) {
 	return isVertOnLeftOfLine(lineVert1, lineVert2, sideVert) ? expressionIndexFit : expressionIndexOtherwise;
 }
 
-template<bool isCyclic>
-void Shape<isCyclic>::lineDefine(
+void Shape::lineDefine(
 	float2& vert1,
 	float2& vert2,
 	vector<float2>* vertsPtr,
@@ -239,8 +239,8 @@ void Shape<isCyclic>::lineDefine(
 	lines.push_back(newLine);
 }
 
-template<bool isCyclic>
-void Shape<isCyclic>::lineBetweenDefine(
+
+void Shape::lineBetweenDefine(
 	int indexIn,
 	int indexOut,
 	vector<float2>* vertsInPtr,

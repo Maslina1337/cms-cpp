@@ -35,7 +35,7 @@ struct lineSided {
 template<typename type>
 struct line { type from; type to; };
 
-template<bool isCyclic> // Size - is a number of arcs. (Except the ends when is not cyclic)
+//template<bool isCyclic> // Size - is a number of arcs. (Except the ends when is not cyclic)
 class Shape {
 public:
 	PureShape sourcePureShape;

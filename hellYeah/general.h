@@ -17,7 +17,7 @@ extern "C" DLL_EXPORT float Tick(float* expCoefficients, int expCoefficientsSize
 using namespace std;
 
 namespace CMS {
-	void getNeighborsIndices(int& prevIndex, int& nextIndex, const float ofAngle, const float* inAngles, const int inAnglesSize, const bool isSeamless = true);
+	void GetNeighborsIndices(int& prevIndex, int& nextIndex, const float ofAngle, const float* inAngles, const int inAnglesSize, const bool isSeamless = true);
 
 	PureShape MergePureShapes(PureShape fromPureShape, PureShape& toPureShape, float factor);
 

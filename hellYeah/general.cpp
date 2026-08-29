@@ -1,10 +1,16 @@
 //#include "pch.h"
 #include "general.h"
+#include "shape.h"
 
 float Tick(float* expCoefficients, int expCoefficientsSize, float v, float h) { CMS::Tick(v, h); return v; };
 
+int main() {
+	CMS::Tick(0.5f, 0.5f);
+	return 0;
+}
+
 namespace CMS {
-	void getNeighborsIndices(int& prevIndex, int& nextIndex, const float ofAngle, const float* inAngles, const int inAnglesSize, const bool isSeamless) {
+	void GetNeighborsIndices(int& prevIndex, int& nextIndex, const float ofAngle, const float* inAngles, const int inAnglesSize, const bool isSeamless) {
 		bool isAnyPrevFound = false;
 		bool isAnyNextFound = false;
 
@@ -102,7 +108,7 @@ namespace CMS {
 
 			int prevIndexV;
 			int nextIndexV;
-			getNeighborsIndices(prevIndexV, nextIndexV, angleVertical, verticalLayerAngles, verticalLayerSize, false);
+			GetNeighborsIndices(prevIndexV, nextIndexV, angleVertical, verticalLayerAngles, verticalLayerSize, false);
 
 			// Horizontal layer (lower)
 			const int horizontalLayerLowerSize = pureShapes[sIndex].pureShapes[prevIndexV].size;
@@ -110,7 +116,7 @@ namespace CMS {
 
 			int prevIndexHL;
 			int nextIndexHL;
-			getNeighborsIndices(prevIndexHL, nextIndexHL, angleHorizontal, horizontalLayerLowerAngles, horizontalLayerLowerSize);
+			GetNeighborsIndices(prevIndexHL, nextIndexHL, angleHorizontal, horizontalLayerLowerAngles, horizontalLayerLowerSize);
 
 			// Horizontal layer (higher)
 			const int horizontalLayerHigherSize = pureShapes[sIndex].pureShapes[nextIndexV].size;
@@ -118,7 +124,7 @@ namespace CMS {
 
 			int prevIndexHH;
 			int nextIndexHH;
-			getNeighborsIndices(prevIndexHH, nextIndexHH, angleHorizontal, horizontalLayerHigherAngles, horizontalLayerHigherSize);
+			GetNeighborsIndices(prevIndexHH, nextIndexHH, angleHorizontal, horizontalLayerHigherAngles, horizontalLayerHigherSize);
 
 			PureShape* pureShapeLowPrevPtr = pureShapes[sIndex].pureShapes[prevIndexV].pureShapes[prevIndexHL];
 			PureShape* pureShapeLowNextPtr = pureShapes[sIndex].pureShapes[prevIndexV].pureShapes[nextIndexHL];
@@ -142,6 +148,8 @@ namespace CMS {
 			PureShape resultMerge = MergePureShapes(prevMergeH, nextMergeH,
 				(angleVertical - verticalLayerAngles[prevIndexV]) /
 				(verticalLayerAngles[nextIndexV] - verticalLayerAngles[prevIndexV]));
+
+			Shape<resultMerge.isCyclic>
 		}
 	}
 };
