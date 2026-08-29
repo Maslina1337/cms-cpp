@@ -1,3 +1,4 @@
+#pragma once
 #include "float2.h"
 #include "pureShape.h"
 #include <string>

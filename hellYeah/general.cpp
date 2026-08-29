@@ -1,6 +1,5 @@
 //#include "pch.h"
 #include "general.h"
-#include "shape.h"
 
 float Tick(float* expCoefficients, int expCoefficientsSize, float v, float h) { CMS::Tick(v, h); return v; };
 
@@ -16,7 +15,7 @@ namespace CMS {
 
 		// TODO: Rewrite me.
 		for (int i = 0; i < inAnglesSize; i++) {
-			int currentCheckAngle = *(inAngles + i);
+			float currentCheckAngle = *(inAngles + i);
 			if (isAnyPrevFound) {
 				if (currentCheckAngle <= ofAngle and currentCheckAngle > inAngles[prevIndex]) prevIndex = i;
 			}
@@ -77,8 +76,8 @@ namespace CMS {
 	}
 
 	PureShape MergePureShapesHorizontally(
-		int prevHorizontalAngle,
-		int nextHorizontalAngle,
+		float prevHorizontalAngle,
+		float nextHorizontalAngle,
 		PureShape* prevHorizontalPureShape,
 		PureShape* nextHorizontalPureShape,
 		float hAngle)
@@ -148,8 +147,6 @@ namespace CMS {
 			PureShape resultMerge = MergePureShapes(prevMergeH, nextMergeH,
 				(angleVertical - verticalLayerAngles[prevIndexV]) /
 				(verticalLayerAngles[nextIndexV] - verticalLayerAngles[prevIndexV]));
-
-			Shape<resultMerge.isCyclic>
 		}
 	}
 };

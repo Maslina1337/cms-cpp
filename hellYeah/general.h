@@ -3,6 +3,7 @@
 #include <array>
 #include <vector>
 #include "pureShape.h"
+#include "shape.h"
 #include "shapes.h"
 #include "float2.h"
 
@@ -22,8 +23,8 @@ namespace CMS {
 	PureShape MergePureShapes(PureShape fromPureShape, PureShape& toPureShape, float factor);
 
 	PureShape MergePureShapesHorizontally(
-		int prevHorizontalAngle,
-		int nextHorizontalAngle,
+		float prevHorizontalAngle,
+		float nextHorizontalAngle,
 		PureShape* prevHorizontalPureShape,
 		PureShape* nextHorizontalPureShape,
 		float hAngle);

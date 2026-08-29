@@ -8,12 +8,18 @@ struct PureShape {
 	vector<float2> locs;
 	vector<float2> locsMiddles;
 	vector<float> fadeoutScales;
+
 	bool isSubtract;
 	bool isCyclic;
 	bool doIgnore;
+
 	float opacity;
 	float fadeoutAngle;
 	float fadeoutLength;
+
+	//const int* const vertsSizePtr;
+	//const int* const linesSizePtr;
+	//const int* const expressionSizePtr;
 };
 
 template<typename type>

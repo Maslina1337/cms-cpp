@@ -13,7 +13,6 @@ enum EXPRESSION_SELECTION {
 	// Otherwise Linear
 };
 
-//class EXPRESSION_SELECTION(Enum) :
 //	NOTHING = [True, False, False]     # Coefficients : [0]
 //	EVERYTHING = [True, False, False]  # Coefficients : [1]
 //	QUADRATIC = [False, True, False]   # Coefficients : [b_x        b_y         b_s             c_x2    c_y2    c_xy  center_x    center_y    a_m_2   use_first_member]
