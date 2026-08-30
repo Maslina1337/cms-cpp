@@ -3,8 +3,8 @@
     <Platform Name="x64" />
     <Platform Name="x86" />
   </Configurations>
-  <Project Path="DLL/DLL.vcxproj" Id="02b5705a-7c09-4c29-bfbe-cd37bfc956f4" />
-  <Project Path="hellYeah/hellYeah.vcxproj" Id="0176b9c7-9e4d-42c1-9332-612a6a52d457">
-    <Build Solution="Debug|x64" Project="false" />
+  <Project Path="DLL/DLL.vcxproj" Id="02b5705a-7c09-4c29-bfbe-cd37bfc956f4">
+    <Build Solution="*|x64" Project="false" />
   </Project>
+  <Project Path="hellYeah/hellYeah.vcxproj" Id="0176b9c7-9e4d-42c1-9332-612a6a52d457" />
 </Solution>

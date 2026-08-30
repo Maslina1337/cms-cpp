@@ -7,6 +7,7 @@
 #include "float2.h"
 #include "segment.h"
 #include "pureShape.h"
+#include "devUtils.h"
 
 using namespace std;
 
@@ -22,22 +23,22 @@ enum VERT_TYPE {
 };
 
 struct lineSided {
-	uint8_t from = 0; // Index of vertex (from)
-	uint8_t to = 0; // Index of vertex (to)
+	int from = 0; // Index of vertex (from)
+	int to = 0; // Index of vertex (to)
 	VERT_TYPE fromType = VERT_TYPE::OUT; // Type of vertex (from)
 	VERT_TYPE toType = VERT_TYPE::OUT; // Type of vertex (to)
 	vector<float2>* fromArrPtr; // Pointer to the array to which the vertex index belongs (from)
 	vector<float2>* toArrPtr; // Pointer to the array to which the vertex index belongs (to)
 
 	float2 sideVert; // Vertex itself. Defines the positive side of the lineSided.
-	uint8_t expressionIndexFit = 0; // Index of expression if the check is on positive side. 
-	uint8_t expressionIndexOtherwise = 0; // Index of expression if the check is on negative side. 
+	int expressionIndexFit = 0; // Index of expression if the check is on positive side. 
+	int expressionIndexOtherwise = 0; // Index of expression if the check is on negative side. 
 };
 
 struct lineExpressioned { 
-	uint8_t from;
-	uint8_t to;
-	uint8_t expressionIndex;
+	int from;
+	int to;
+	int expressionIndex;
 };
 
 //template<bool isCyclic> // Size - is a number of arcs. (Except the ends when is not cyclic)
@@ -53,13 +54,13 @@ private:
 	vector<lineSided> linesOut;
 	vector<lineSided> linesBetween;
 
-	uint8_t vertsSize;
-	uint8_t linesSize;
-	uint8_t expressionSize;
+	int vertsSize;
+	int linesSize;
+	int expressionSize;
 
 	bool defaultExpressionIndex = 0;
 
-	vector<array<uint8_t, 2>> bothExpsPerInterVert;
+	vector<array<int, 2>> bothExpsPerInterVert;
 
 	// TODO: Maybe vectors to arrays??
 	vector<array<float, 10>> expressionsCoefficients = { { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }, { 1, 0, 0, 0, 0, 0, 0, 0, 0, 0 } };
@@ -73,31 +74,31 @@ private:
 
 	bool isVertHigherThanLine(const float2& lineVert1, const float2& lineVert2, const float2& sideVert) const;
 
-	uint8_t getProperExp(const float2& lineVert1, const float2& lineVert2, const float2& sideVert, const uint8_t expressionIndexFit, const uint8_t expressionIndexOtherwise);
+	int getProperExp(const float2& lineVert1, const float2& lineVert2, const float2& sideVert, const int expressionIndexFit, const int expressionIndexOtherwise);
 
 	// TODO: vert1 is useless in segments next to first one.
 	void lineDefine(
-		float2& vert1,
+		//float2& vert1,
 		float2& vert2,
 		vector<float2>* vertsPtr,
 		vector<lineSided>& lines,
 		float2 sideVert,
 		VERT_TYPE vertType,
-		uint8_t expressionIndexFit,
-		uint8_t expressionIndexOtherwise,
+		int expressionIndexFit,
+		int expressionIndexOtherwise,
 		float& leftestVertX,
-		bool& defaultExpressionIndex,
-		bool isFirstSegment = false
+		bool& defaultExpressionIndex
+		//bool isFirstSegment = false
 	);
 
 	void lineBetweenDefine(
-		uint8_t indexIn,
-		uint8_t indexOut,
+		int indexIn,
+		int indexOut,
 		vector<float2>* vertsInPtr,
 		vector<float2>* vertsOutPtr,
 		vector<lineSided>& lines,
 		float2 sideVert,
-		uint8_t expressionIndexFit,
-		uint8_t expressionIndexOtherwise
+		int expressionIndexFit,
+		int expressionIndexOtherwise
 	);
 };

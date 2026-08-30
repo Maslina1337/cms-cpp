@@ -1,5 +1,8 @@
 #pragma once
 #include <cmath>
+#include <string>
+
+using namespace std;
 
 class float2 {
 public:
@@ -23,6 +26,10 @@ public:
 
     float2 operator*(const float s) const {
         return float2(x * s, y * s);
+    }
+
+    float2 operator/(const float s) const {
+        return float2(x / s, y / s);
     }
 
     float2 operator-() const {
@@ -52,4 +59,15 @@ public:
     float2 getNormalized(float length) {
         return float2(x / length, y / length);
     }
+
+    string getString() {
+        return "(" + to_string(this->x) + ", " + to_string(this->y) + ")";
+    }
+
+    //friend std::ostream& operator<<(std::ostream& os, float2* v);
 };
+
+//std::ostream& operator<<(std::ostream& os, float2* v) {
+//    os << "(" << v->x << ", " << v->y << ")";
+//    return os;
+//};

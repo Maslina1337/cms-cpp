@@ -47,5 +47,8 @@
     <ClCompile Include="..\hellYeah\shape.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
+    <ClCompile Include="..\hellYeah\devUtils.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

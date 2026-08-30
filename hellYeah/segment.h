@@ -38,6 +38,8 @@ public:
 	array<float, 10> expressionCoefficients = { 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f };
 
 	Segment(float2 v[2 + isTriple], float2 vf[2 + isTriple]) {
+		int size = 2 + isTriple;
+
 		vog[0][0] = v[0];
 		vog[0][1] = v[1];
 		if constexpr (isTriple) { vog[0][2] = v[2]; }
@@ -46,19 +48,25 @@ public:
 		if constexpr (isTriple) { vog[1][2] = vf[2]; }
 
 		float2 v12 = v[1] - v[0];
-		float2 v23 = v[2] - v[1];
-		float2 v13 = v[2] - v[0];
-
-		bool isStraight;
-		if constexpr (isTriple) { isStraight = true; }
-		else {
-			isStraight = abs(v12.x) < 0.0001f ?
-				(abs(v23.x) < 0.0001f * abs(v23.y / v12.x)) :
-				(abs(v[2].y - v12.y / v12.x * (v[2].x - v[0].x) - v[0].y) < 0.0001f);
+		
+		float2 v23;
+		float2 v13;
+		if constexpr (isTriple) {
+			v23 = v[2] - v[1];
+			v13 = v[2] - v[0];
 		}
+		
+
+		//bool isStraight;
+		//if constexpr (not isTriple) { isStraight = true; }
+		//else {
+			//isStraight = abs(v12.x) < 0.0001f ?
+			//	(abs(v23.x) < 0.0001f * abs(v23.y / v12.x)) :
+			//	(abs(v[2].y - v12.y / v12.x * (v[2].x - v[0].x) - v[0].y) < 0.0001f);
+		//}
 
 		// Straight case. // TODO: Can be copyed to const exp above.
-		if (isStraight)
+		if (not isTriple)
 		{
 			vertsIn[0] = v[0];
 			vertsIn[1] = v[size - 1];
@@ -97,6 +105,8 @@ public:
 			return;
 		}
 
+		// Following Code is only for triple non-straight segments.
+
 		// TODO: Merge the Reorder and PointsDefine methods.
 		PointsDefine(v, false);
 		PointsDefine(vf, true);
@@ -120,9 +130,6 @@ public:
 			vertsOut[0] = vf[0];
 			vertsOut[1] = vf[2];
 
-			//vertsInSize = 3;
-			//vertsOutSize = 2;
-
 			isVertsInTriple = true;
 			isVertsOutTriple = false;
 		}
@@ -133,9 +140,6 @@ public:
 			vertsOut[0] = vf[0];
 			vertsOut[1] = vf[1];
 			vertsOut[2] = vf[2];
-
-			//vertsInSize = 2;
-			//vertsOutSize = 3;
 
 			isVertsInTriple = false;
 			isVertsOutTriple = true;
@@ -219,13 +223,13 @@ public:
 
 private:
 	void Reorder(const int order1, const int order2, const int order3) {
-		vc[0][0] = va[0][0][order1];
-		vc[0][1] = va[0][1][order2];
-		vc[0][2] = va[0][2][order3];
+		vc[0][0] = va[0][order1];
+		vc[0][1] = va[0][order2];
+		vc[0][2] = va[0][order3];
 
-		vc[1][0] = va[1][0][order1];
-		vc[1][1] = va[1][1][order2];
-		vc[1][2] = va[1][2][order3];
+		vc[1][0] = va[1][order1];
+		vc[1][1] = va[1][order2];
+		vc[1][2] = va[1][order3];
 
 		vh[0][0] = vc[0][1] + (vc[0][0] - vc[0][1]) / 2;
 		vh[0][1] = vc[0][1];

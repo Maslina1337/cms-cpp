@@ -152,6 +152,7 @@
     </Manifest>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\hellYeah\devUtils.h" />
     <ClInclude Include="..\hellYeah\float2.h" />
     <ClInclude Include="..\hellYeah\general.h" />
     <ClInclude Include="..\hellYeah\pureShape.h" />

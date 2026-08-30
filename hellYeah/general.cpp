@@ -147,6 +147,8 @@ namespace CMS {
 			PureShape resultMerge = MergePureShapes(prevMergeH, nextMergeH,
 				(angleVertical - verticalLayerAngles[prevIndexV]) /
 				(verticalLayerAngles[nextIndexV] - verticalLayerAngles[prevIndexV]));
+
+			Shape dev (resultMerge);
 		}
 	}
 };
