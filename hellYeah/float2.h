@@ -8,12 +8,10 @@ class float2 {
 public:
     float x;
     float y;
-    float length;
 
     float2(const float x_ = 0.0, const float y_ = 0.0) {
         x = x_;
         y = y_;
-        length = 0.0f;
     }
 
     float2 operator+(const float2& v) const {
@@ -46,21 +44,27 @@ public:
         return x * v.y - y * v.x;
     }
 
-    float calculateLength() {
-        length = sqrt(x * x + y * y);
-        return length;
+    float getLength() const {
+        return sqrt(x * x + y * y);
     }
 
-    float2 getNormalized() {
-        length = sqrt(x * x + y * y);
+    float2 getNormalized() const {
+        float length = getLength();
         return float2(x/length, y/length);
     }
 
-    float2 getNormalized(float length) {
+    float2 getNormalized(float length) const {
         return float2(x / length, y / length);
     }
 
-    string getString() {
+    float2 normalize() {
+        float length = getLength();
+        x /= length;
+        y /= length;
+        return *this;
+    }
+
+    string getString() const {
         return "(" + to_string(this->x) + ", " + to_string(this->y) + ")";
     }
 

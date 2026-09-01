@@ -11,18 +11,18 @@
 #define BACKEND_H
 #define DLL_EXPORT __declspec(dllexport)
 
-extern "C" DLL_EXPORT float Tick(float* expCoefficients, int expCoefficientsSize, float v, float h);
+extern "C" DLL_EXPORT float tick(float* expCoefficients, int expCoefficientsSize, float v, float h);
 
 #endif
 
 using namespace std;
 
 namespace CMS {
-	void GetNeighborsIndices(int& prevIndex, int& nextIndex, const float ofAngle, const float* inAngles, const int inAnglesSize, const bool isSeamless = true);
+	void getNeighborsIndices(int& prevIndex, int& nextIndex, const float ofAngle, const float* inAngles, const int inAnglesSize, const bool isSeamless = true);
 
-	PureShape MergePureShapes(PureShape fromPureShape, PureShape& toPureShape, float factor);
+	PureShape mergePureShapes(PureShape fromPureShape, PureShape& toPureShape, float factor);
 
-	PureShape MergePureShapesHorizontally(
+	PureShape mergePureShapesHorizontally(
 		float prevHorizontalAngle,
 		float nextHorizontalAngle,
 		PureShape* prevHorizontalPureShape,
@@ -30,5 +30,5 @@ namespace CMS {
 		float hAngle);
 
 	// angleVertical = [0-1 (means 0-180)]		angleHorizontal = [0-1 (means 0-360)]
-	void Tick(float angleVertical, float angleHorizontal);
+	void tick(float angleVertical, float angleHorizontal);
 };

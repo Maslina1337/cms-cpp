@@ -1,32 +1,6 @@
 //#include "pch.h"
 #include "shape.h"
 
-//template<typename type, int s1, int s2>
-//void combine2Arrays(array<type, s1 + s2>& toArray, array<type, s1> a1, array<type, s2> a2) {
-//	for (int i = 0; i < s1; i++) {
-//		toArray[i] = a1[i];
-//	}
-//
-//	for (int i = 0; i < s2; i++) {
-//		toArray[i + s1] = a2[i];
-//	}
-//}
-//
-//template<typename type, int s1, int s2, int s3>
-//void combine3Arrays(array<type, s1 + s2 + s3>& toArray, array<type, s1> a1, array<type, s2> a2, array<type, s3> a3) {
-//	for (int i = 0; i < s1; i++) {
-//		toArray[i] = a1[i];
-//	}
-//
-//	for (int i = 0; i < s2; i++) {
-//		toArray[i + s1] = a2[i];
-//	}
-//
-//	for (int i = 0; i < s3; i++) {
-//		toArray[i + s1 + s2] = a3[i];
-//	}
-//};
-
 Shape::Shape(PureShape ps) {
 	sourcePureShape = ps;
 
@@ -38,23 +12,42 @@ Shape::Shape(PureShape ps) {
 	vector<float2> locsFadeout(locsSize);
 	vector<float2> locsMiddlesFadeout(locsMiddlesSize);
 
-	locsMiddlesFadeout[0] = locsMiddlesFadeout[0] + shift;
+	locsMiddlesFadeout[0] = ps.locsMiddles[0] + shift;
 
 	//// Fadeout verts define.
-	for (int i = 1; i < locsMiddlesSize - ps.isCyclic; i++) {
+	for (int i = 1; i < locsSize - ps.isCyclic + 1; i++) {
 		locsMiddlesFadeout[i] = ((ps.locsMiddles[i] - ps.locsMiddles[i - 1])* ps.fadeoutScales[i - 1] + locsMiddlesFadeout[i - 1]);
 	}
 
 	if (ps.isCyclic) {
-		locsFadeout[0] = (ps.locs[0] - ps.locsMiddles[locsSize - 1]) * ps.fadeoutScales[locsSize - 1] + locsMiddlesFadeout[locsSize - 1];
-		for (int i = 1; i < locsSize; i++) {
-			locsFadeout[i - 1] = (ps.locs[i - 1] - ps.locsMiddles[i]) * ps.fadeoutScales[i] + locsMiddlesFadeout[i];
+		for (int i = 0; i < locsSize; i++) {
+			int j = (i - 1 + locsSize) % locsSize;
+			locsFadeout[i] = (ps.locs[i] - ps.locsMiddles[j]) * ps.fadeoutScales[j] + locsMiddlesFadeout[j];
 		};
 	}
 	else {
 		for (int i = 0; i < locsSize; i++) {
 			locsFadeout[i] = (ps.locs[i] - ps.locsMiddles[i]) * ps.fadeoutScales[i] + locsMiddlesFadeout[i];
 		};
+	}
+
+	cout << endl << "LOCS" << endl;
+	for (int i = 0; i < ps.locs.size(); i++) {
+		cout << ps.locs[i].getString() << endl;
+	}
+	cout << endl << "LOCS MIDDLES" << endl;
+	for (int i = 0; i < ps.locsMiddles.size(); i++) {
+		cout << ps.locsMiddles[i].getString() << endl;
+	}
+
+	cout << endl << "FADEOUT" << endl;
+	for (int i = 0; i < locsSize; i++) {
+		cout << locsFadeout[i].getString() << endl;
+	}
+
+	cout << endl << "FADEOUT MIDDLE" << endl;
+	for (int i = 0; i < locsMiddlesSize; i++) {
+		cout << locsMiddlesFadeout[i].getString() << endl;
 	}
 
 	float leftestVertX;
@@ -66,6 +59,9 @@ Shape::Shape(PureShape ps) {
 		float2 v[2] = { (ps.locsMiddles[0] - ps.locs[0]).getNormalized() * 2 + ps.locs[0], ps.locsMiddles[0] };
 		float2 vf[2] = { (locsMiddlesFadeout[0] - locsFadeout[0]).getNormalized() * 2 + locsFadeout[0], locsMiddlesFadeout[0] };
 		Segment<false> s (v, vf);
+
+		expressionsCoefficients.push_back(s.expressionCoefficients);
+		expressionsSelection.push_back(s.expressionSelection);
 
 		vertsIn.push_back(s.vertsIn[0]);
 		vertsOut.push_back(s.vertsOut[0]);
@@ -81,12 +77,14 @@ Shape::Shape(PureShape ps) {
 		//	cout << e.getString();
 		//}
 
-		float2 v[3] = { ps.locsMiddles[(arcIndex - 1 + locsSize) % locsSize], ps.locs[arcIndex - (not ps.isCyclic)], ps.locsMiddles[arcIndex] };
-		float2 vf[3] = { locsMiddlesFadeout[(arcIndex - 1 + locsSize) % locsSize], locsFadeout[arcIndex - (not ps.isCyclic)], locsMiddlesFadeout[arcIndex] };
+		int j = (arcIndex - 1 + locsSize) % locsSize;
+		float2 v[3] = { ps.locsMiddles[j], ps.locs[arcIndex - (not ps.isCyclic)], ps.locsMiddles[arcIndex] };
+		float2 vf[3] = { locsMiddlesFadeout[j], locsFadeout[arcIndex - (not ps.isCyclic)], locsMiddlesFadeout[arcIndex] };
 
 		Segment<true> s (v, vf);
 
-		cout << s.isVertsInTriple << " " << s.isVertsOutTriple << endl;
+		expressionsCoefficients.push_back(s.expressionCoefficients);
+		expressionsSelection.push_back(s.expressionSelection);
 
 		// Defining lines.
 		lineDefine(s.vertsIn[1], &vertsIn, linesIn, s.vertsOut[1], VERT_TYPE::IN, arcIndex + 2, 0, leftestVertX, defaultExpressionIndex);
@@ -99,7 +97,7 @@ Shape::Shape(PureShape ps) {
 			(s.isVertsInTriple ? s.vertsIn : s.vertsOut)[1],
 			arcIndex + 2, arcIndex + 3);
 
-		cout << "CURRENT V SIZES: " << vertsIn.size() << " " << vertsOut.size() << endl;
+		//cout << "CURRENT V SIZES: " << vertsIn.size() << " " << vertsOut.size() << endl;
 	}
 
 	// Fixing the wrong index of first added lines.
@@ -113,6 +111,9 @@ Shape::Shape(PureShape ps) {
 		float2 v[2] = { ps.locsMiddles[locsMiddlesSize - 1], (ps.locsMiddles[locsMiddlesSize - 1] - ps.locs[locsSize - 1]).getNormalized() * 2 + ps.locs[locsSize - 1] };
 		float2 vf[2] = { locsMiddlesFadeout[locsMiddlesSize - 1], (locsMiddlesFadeout[locsMiddlesSize - 1] - locsFadeout[locsSize - 1]).getNormalized() * 2 + locsFadeout[locsSize - 1] };
 		Segment<false> s (v, vf);
+
+		expressionsCoefficients.push_back(s.expressionCoefficients);
+		expressionsSelection.push_back(s.expressionSelection);
 
 		lineDefine(s.vertsIn[1], &vertsIn, linesIn, s.vertsOut[1], VERT_TYPE::IN, locsSize + 3, 0, leftestVertX, defaultExpressionIndex);
 		lineDefine(s.vertsOut[1], &vertsOut, linesOut, s.vertsIn[1], VERT_TYPE::OUT, locsSize + 3, 1, leftestVertX, defaultExpressionIndex);
@@ -159,7 +160,7 @@ Shape::Shape(PureShape ps) {
 	cout << "expressionsSelection" << endl;
 	for (int i = 0; i < expressionSize; i++) {
 		cout << i << ". \t";
-		for (int j = 0; j < 10; j++) cout << expressionsSelection[i][j] << " \t";
+		for (int j = 0; j < 3; j++) cout << expressionsSelection[i][j] << " \t";
 		cout << endl;
 	}
 

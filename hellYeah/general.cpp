@@ -1,15 +1,15 @@
 //#include "pch.h"
 #include "general.h"
 
-float Tick(float* expCoefficients, int expCoefficientsSize, float v, float h) { CMS::Tick(v, h); return v; };
+float tick(float* expCoefficients, int expCoefficientsSize, float v, float h) { CMS::tick(v, h); return v; };
 
 int main() {
-	CMS::Tick(0.5f, 0.5f);
+	CMS::tick(0.5f, 0.5f);
 	return 0;
 }
 
 namespace CMS {
-	void GetNeighborsIndices(int& prevIndex, int& nextIndex, const float ofAngle, const float* inAngles, const int inAnglesSize, const bool isSeamless) {
+	void getNeighborsIndices(int& prevIndex, int& nextIndex, const float ofAngle, const float* inAngles, const int inAnglesSize, const bool isSeamless) {
 		bool isAnyPrevFound = false;
 		bool isAnyNextFound = false;
 
@@ -49,7 +49,7 @@ namespace CMS {
 		}
 	};
 
-	PureShape MergePureShapes(PureShape fromPureShape, PureShape& toPureShape, float factor) {
+	PureShape mergePureShapes(PureShape fromPureShape, PureShape& toPureShape, float factor) {
 		// Modifying the from pure shape.
 
 		// Vectors.
@@ -75,7 +75,7 @@ namespace CMS {
 		return fromPureShape;
 	}
 
-	PureShape MergePureShapesHorizontally(
+	PureShape mergePureShapesHorizontally(
 		float prevHorizontalAngle,
 		float nextHorizontalAngle,
 		PureShape* prevHorizontalPureShape,
@@ -84,21 +84,22 @@ namespace CMS {
 	{
 		if (prevHorizontalAngle == nextHorizontalAngle) return *prevHorizontalPureShape;
 
-		// -180, Next, ... Past, h, 180
-		if (nextHorizontalAngle < prevHorizontalAngle) return MergePureShapes(
+		cout << "FACTOR HOR: " << (nextHorizontalAngle < prevHorizontalAngle) << " " << hAngle << " " << prevHorizontalAngle << " " << nextHorizontalAngle << " " << ((nextHorizontalAngle < prevHorizontalAngle) ?
+			(hAngle - prevHorizontalAngle) / (1 - prevHorizontalAngle + nextHorizontalAngle) : 
+			(hAngle - prevHorizontalAngle) / (nextHorizontalAngle - prevHorizontalAngle)) << endl;
+
+		return mergePureShapes(
 			*prevHorizontalPureShape, *nextHorizontalPureShape,
-			(hAngle - prevHorizontalAngle) / (1 - prevHorizontalAngle + nextHorizontalAngle)
+			(nextHorizontalAngle < prevHorizontalAngle) ?
+			(hAngle - prevHorizontalAngle) / (1 - prevHorizontalAngle + nextHorizontalAngle) : // -180, Next, ... Past, h, 180
+			(hAngle - prevHorizontalAngle) / (nextHorizontalAngle - prevHorizontalAngle) // -180, ... Past, h, Next, ... 180
 		);
 
-		// -180, ... Past, h, Next, ... 180
-		return MergePureShapes(
-			*prevHorizontalPureShape, *nextHorizontalPureShape,
-			(hAngle - prevHorizontalAngle) / (prevHorizontalAngle - nextHorizontalAngle)
-		);
+		
 	}
 
 	// angleVertical = [0-1 (means 0-180)]		angleHorizontal = [0-1 (means 0-360)]
-	void Tick(float angleVertical, float angleHorizontal) {
+	void tick(float angleVertical, float angleHorizontal) {
 		for (int sIndex = 0; sIndex < shapesSize; sIndex++) {
 
 			// Vertical layer
@@ -107,7 +108,7 @@ namespace CMS {
 
 			int prevIndexV;
 			int nextIndexV;
-			GetNeighborsIndices(prevIndexV, nextIndexV, angleVertical, verticalLayerAngles, verticalLayerSize, false);
+			getNeighborsIndices(prevIndexV, nextIndexV, angleVertical, verticalLayerAngles, verticalLayerSize, false);
 
 			// Horizontal layer (lower)
 			const int horizontalLayerLowerSize = pureShapes[sIndex].pureShapes[prevIndexV].size;
@@ -115,7 +116,7 @@ namespace CMS {
 
 			int prevIndexHL;
 			int nextIndexHL;
-			GetNeighborsIndices(prevIndexHL, nextIndexHL, angleHorizontal, horizontalLayerLowerAngles, horizontalLayerLowerSize);
+			getNeighborsIndices(prevIndexHL, nextIndexHL, angleHorizontal, horizontalLayerLowerAngles, horizontalLayerLowerSize);
 
 			// Horizontal layer (higher)
 			const int horizontalLayerHigherSize = pureShapes[sIndex].pureShapes[nextIndexV].size;
@@ -123,28 +124,31 @@ namespace CMS {
 
 			int prevIndexHH;
 			int nextIndexHH;
-			GetNeighborsIndices(prevIndexHH, nextIndexHH, angleHorizontal, horizontalLayerHigherAngles, horizontalLayerHigherSize);
+			getNeighborsIndices(prevIndexHH, nextIndexHH, angleHorizontal, horizontalLayerHigherAngles, horizontalLayerHigherSize);
 
 			PureShape* pureShapeLowPrevPtr = pureShapes[sIndex].pureShapes[prevIndexV].pureShapes[prevIndexHL];
 			PureShape* pureShapeLowNextPtr = pureShapes[sIndex].pureShapes[prevIndexV].pureShapes[nextIndexHL];
 			PureShape* pureShapeHighPrevPtr = pureShapes[sIndex].pureShapes[nextIndexV].pureShapes[prevIndexHH];
 			PureShape* pureShapeHighNextPtr = pureShapes[sIndex].pureShapes[nextIndexV].pureShapes[nextIndexHH];
 
-			PureShape prevMergeH = MergePureShapesHorizontally(
+			PureShape prevMergeH = mergePureShapesHorizontally(
 				horizontalLayerLowerAngles[prevIndexHL],
 				horizontalLayerLowerAngles[nextIndexHL],
 				pureShapes[sIndex].pureShapes[prevIndexV].pureShapes[prevIndexHL],
 				pureShapes[sIndex].pureShapes[prevIndexV].pureShapes[nextIndexHL],
 				angleHorizontal);
 
-			PureShape nextMergeH = MergePureShapesHorizontally(
+			PureShape nextMergeH = mergePureShapesHorizontally(
 				horizontalLayerHigherAngles[prevIndexHL],
 				horizontalLayerLowerAngles[nextIndexHL],
 				pureShapes[sIndex].pureShapes[nextIndexV].pureShapes[prevIndexHH],
 				pureShapes[sIndex].pureShapes[nextIndexV].pureShapes[nextIndexHH],
 				angleHorizontal);
 
-			PureShape resultMerge = MergePureShapes(prevMergeH, nextMergeH,
+			cout << "FACTOR V " << ((angleVertical - verticalLayerAngles[prevIndexV]) /
+				(verticalLayerAngles[nextIndexV] - verticalLayerAngles[prevIndexV]));
+
+			PureShape resultMerge = mergePureShapes(prevMergeH, nextMergeH,
 				(angleVertical - verticalLayerAngles[prevIndexV]) /
 				(verticalLayerAngles[nextIndexV] - verticalLayerAngles[prevIndexV]));
 
