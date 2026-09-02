@@ -1,4 +1,4 @@
-//#pragma once
+#pragma once
 #include <cmath>
 #include <array>
 #include <string>
@@ -35,21 +35,11 @@ public:
 	bool isVertsInTriple;
 	bool isVertsOutTriple;
 
-	bool expressionSelection[3] = {false, false, false}; // Raw, Quadratic, Constant, otherwise Linear
-	float expressionCoefficients[10] = {0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f};
-
-	Segment(float2 v[2 + isTriple], float2 vf[2 + isTriple]) {
+	Segment(float2 v[2 + isTriple], float2 vf[2 + isTriple], vector<float>* expressionsCoefficientsPtr, vector<bool>* expressionsSelectionPtr) {
 		int size = 2 + isTriple;
 
-		vog[0][0] = v[0];
-		vog[0][1] = v[1];
-		if constexpr (isTriple) { vog[0][2] = v[2]; }
-		vog[1][0] = vf[0];
-		vog[1][1] = vf[1];
-		if constexpr (isTriple) { vog[1][2] = vf[2]; }
-
 		// Straight case. // TODO: Can be copyed to const exp above.
-		if (not isTriple)
+		if constexpr (not isTriple)
 		{
 			vertsIn[0] = v[0];
 			vertsIn[1] = v[size - 1];
@@ -88,7 +78,14 @@ public:
 			return;
 		}
 
-		// Following Code is only for triple non-straight segments.
+		// Following Code is only for triple segments.
+
+		vog[0][0] = v[0];
+		vog[0][1] = v[1];
+		vog[0][2] = v[2];
+		vog[1][0] = vf[0];
+		vog[1][1] = vf[1];
+		vog[1][2] = vf[2];
 
 		float2 v12 = v[1] - v[0];
 		float2 v23 = v[2] - v[1];
@@ -96,9 +93,7 @@ public:
 
 		// TODO: Merge the reorder and pointsDefine methods.
 		pointsDefine(v, false);
-		cout << "WAT BETWWEN " << center[0].getString() << " " << center[1].getString() << endl;
 		pointsDefine(vf, true);
-
 		
 		// TODO: reorder can be moved before pointsDefine
 		if (abs(v13.x) < abs(v12.x) * 0.05) reorder(1, 2, 3);
@@ -147,12 +142,7 @@ public:
 
 		const float s = B0f / B0;
 
-		cout << endl << "Start"  << endl;
-		cout << A1 << endl << B0 << endl << b << endl << A0 << endl << a << endl << B0f << endl << s;
-
 		const float2 shift = center[0] - center[1];
-
-		cout << endl << shift.getString() << " " << center[0].getString() << " " << center[1].getString() << endl;
 
 		// TODO Optimize dis coefficients..
 		const float U4 = 1 / (B0 * B0);
@@ -177,9 +167,6 @@ public:
 		const float U127 = U2 + U1 + U7;
 
 		const float a_ = shift.x * shift.x * U3558 + shift.y * shift.y * U49 + shift.x * shift.y * U127 + U11;
-
-		cout << endl << endl << endl << endl;
-		cout << U4 << endl << U5 << endl << U6 << endl << U9 << endl << U8 << endl << U2 << endl << U7 << endl << U1 << endl << U3 << endl << U11 << endl << U12 << endl << a_ << endl << shift.getString() << endl;
 
 		// Final Coefficients for quadratic and linear cases.
 		const float a_m_2 = a_ * 2;
@@ -240,31 +227,21 @@ private:
 	};
 
 	void pointsDefine(float2 v[3], const bool isFadeout) {
-		//cout << "ME " << isFadeout << " " << v[0].getString() << " " << v[1].getString() << " " << v[2].getString() << endl;
 		const float2 center_ = v[0] + v[2] - v[1];
-		cout << "WAT 1" << center[0].getString() << " " << center[1].getString() << endl;
 		center[isFadeout] = center_;
-		cout << "WAT 2" << center[0].getString() << " " << center[1].getString() << endl;
-		//cout << "CENTER " << center_.getString() << " " << center[isFadeout].getString() << " " << isFadeout << endl;
 
 		const float2 vh0 = v[0] - center_;
 		const float2 vh1 = v[1] - center_;
 		const float2 vh2 = v[2] - center_;
-		cout << "WAT 3" << center[0].getString() << " " << center[1].getString() << endl;
-
-		//cout << endl << vh0.getString() << " " << vh1.getString() << " " << vh2.getString() << endl;
 
 		vh[isFadeout][0] = vh0;
 		vh[isFadeout][1] = vh1;
 		vh[isFadeout][2] = vh2;
-		cout << "WAT 4" << center[0].getString() << " " << center[1].getString() << endl;
 
 		const float2 va0 = (vh0 - vh1) * 2 + vh1;
 		const float2 va1 = vh1;
 		const float2 va2 = (vh2 - vh1) * 2 + vh1;
 		const float2 va3 = -vh1;
-
-		cout << "WAT 5" << center[0].getString() << " " << center[1].getString() << endl;
 
 		va[isFadeout][0] = va0;
 		va[isFadeout][1] = va1;
@@ -274,7 +251,5 @@ private:
 		vc[isFadeout][0] = va0;
 		vc[isFadeout][1] = va1;
 		vc[isFadeout][2] = va2;
-
-		cout << "WAT 6" << center[0].getString() << " " << center[1].getString() << endl;
 	};
 };

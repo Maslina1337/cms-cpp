@@ -7,15 +7,9 @@
 #include "float2.h"
 #include "segment.h"
 #include "pureShape.h"
-#include "devUtils.h"
+#include "shapes.h"
 
 using namespace std;
-
-//template<typename type, int s1, int s2>
-//void combine2Arrays(array<type, s1 + s2>& toArray, array<type, s1> a1, array<type, s2> a2);
-//
-//template<typename type, int s1, int s2, int s3>
-//void combine3Arrays(array<type, s1 + s2 + s3>& toArray, array<type, s1> a1, array<type, s2> a2, array<type, s3> a3);
 
 enum VERT_TYPE {
 	OUT,
@@ -46,6 +40,9 @@ class Shape {
 public:
 	PureShape sourcePureShape;
 
+	vector<array<float, 10>> expressionsCoefficients = {};
+	vector<array<bool, 3>> expressionsSelection = {};
+
 private:
 	vector<float2> vertsIn;
 	vector<float2> vertsOut;
@@ -54,20 +51,10 @@ private:
 	vector<lineSided> linesOut;
 	vector<lineSided> linesBetween;
 
-	int vertsSize;
-	int linesSize;
-	int expressionSize;
-
 	bool defaultExpressionIndex = 0;
 
-	vector<array<int, 2>> bothExpsPerInterVert;
-
-	// TODO: Maybe vectors to arrays??
-	vector<array<float, 10>> expressionsCoefficients = {{0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, {1, 0, 0, 0, 0, 0, 0, 0, 0, 0}};
-	vector<array<bool, 3>> expressionsSelection = {{true, false, false}, {true, false, false}};
-
 public:
-	Shape(PureShape ps);
+	Shape(PureShape ps, vector<float>* expressionsCoefficientsPtr, vector<bool>* expressionsSelectionPtr);
 
 private:
 	bool isVertOnLeftOfLine(const float2& lineVert1, const float2& lineVert2, const float2& sideVert) const;

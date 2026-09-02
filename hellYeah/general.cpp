@@ -7,10 +7,10 @@ void CMSTick(float v, float h, bool* expressionSelectionsPerShape, float* expres
 	CMS::tick(v, h, expressionSelectionsPerShape, expressionsCoefficientsPerShape);
 };
 
-//int main() {
-//	CMS::tick(0.5f, 0.5f, nullptr, nullptr);
-//	return 0;
-//}
+int main() {
+	CMS::tick(0.5f, 0.5f, nullptr, nullptr);
+	return 0;
+}
 
 namespace CMS {
 	void getNeighborsIndices(int& prevIndex, int& nextIndex, const float ofAngle, const float* inAngles, const int inAnglesSize, const bool isSeamless) {
@@ -88,26 +88,30 @@ namespace CMS {
 	{
 		if (prevHorizontalAngle == nextHorizontalAngle) return *prevHorizontalPureShape;
 
-		cout << "FACTOR HOR: " << (nextHorizontalAngle < prevHorizontalAngle) << " " << hAngle << " " << prevHorizontalAngle << " " << nextHorizontalAngle << " " << ((nextHorizontalAngle < prevHorizontalAngle) ?
-			(hAngle - prevHorizontalAngle) / (1 - prevHorizontalAngle + nextHorizontalAngle) : 
-			(hAngle - prevHorizontalAngle) / (nextHorizontalAngle - prevHorizontalAngle)) << endl;
-
 		return mergePureShapes(
 			*prevHorizontalPureShape, *nextHorizontalPureShape,
 			(nextHorizontalAngle < prevHorizontalAngle) ?
 			(hAngle - prevHorizontalAngle) / (1 - prevHorizontalAngle + nextHorizontalAngle) : // -180, Next, ... Past, h, 180
 			(hAngle - prevHorizontalAngle) / (nextHorizontalAngle - prevHorizontalAngle) // -180, ... Past, h, Next, ... 180
 		);
-
-		
 	}
 
 	// v = [0-1 (means 0-180)]		h = [0-1 (means 0-360)]
-	void tick(float v, float h, bool* expressionsSelectionsPerShape, float* expressionsCoefficientsPerShape) {
+	void tick(float v, float h, bool* expressionsSelectionsOutcome, float* expressionsCoefficientsOutcome) {
 
 		// Raw Expressions.
-		vector<array<float, 10>> expressionsCoefficients = { {0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, {1, 0, 0, 0, 0, 0, 0, 0, 0, 0} };
-		vector<array<bool, 3>> expressionsSelections = { {true, false, false}, {true, false, false} };
+		vector<float> expressionsCoefficients = { 
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+			1, 0, 0, 0, 0, 0, 0, 0, 0, 0 
+		};
+
+		vector<bool> expressionsSelections = { 
+			true, false, false, 
+			true, false, false 
+		};
+
+		expressionsCoefficients.reserve((expressionsSize + 2) * 10);
+		expressionsSelections.reserve((expressionsSize + 2) * 3);
 
 		for (int sIndex = 0; sIndex < shapesSize; sIndex++) {
 
@@ -154,18 +158,15 @@ namespace CMS {
 				pureShapes[sIndex].pureShapes[nextIndexV].pureShapes[nextIndexHH],
 				h);
 
-			cout << "FACTOR V " << ((v - verticalLayerAngles[prevIndexV]) /
-				(verticalLayerAngles[nextIndexV] - verticalLayerAngles[prevIndexV]));
-
 			PureShape resultMerge = mergePureShapes(prevMergeH, nextMergeH,
 				(v - verticalLayerAngles[prevIndexV]) /
 				(verticalLayerAngles[nextIndexV] - verticalLayerAngles[prevIndexV]));
 
-			Shape s (resultMerge);
+			Shape s (resultMerge, &expressionsCoefficients, &expressionsSelections);
 
-			for (int i = 0; i < 10; i++) {
-				*((10 * sIndex) + expressionsSelectionsPerShape + i) = s.expressionsCoefficients[i];
-			}
+			//for (int i = 0; i < 10; i++) {
+			//	*((10 * sIndex) + expressionsSelectionsPerShape + i) = s.expressionsCoefficients[i];
+			//}
 		}
 	}
 };

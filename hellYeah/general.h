@@ -1,3 +1,4 @@
+#pragma once
 #include <cmath>
 #include <iostream>
 #include <array>
@@ -13,7 +14,7 @@
 
 extern "C" {
 	void DLL_EXPORT CMSGetShapesSizes(int* shapesSize, int* vertsSize, int* linesSize, int* expressionsSize);
-	void DLL_EXPORT CMSGetPersonalShapesSizes(int* shapesSizes)
+	void DLL_EXPORT CMSGetPersonalShapesSizes(int* shapesSizes);
 	void DLL_EXPORT CMSTick(float v, float h, bool* expressionSelectionsPerShape, float* expressionsCoefficientsPerShape);
 }
 

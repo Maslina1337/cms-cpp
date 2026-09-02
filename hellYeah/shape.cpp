@@ -1,8 +1,12 @@
-//#include "pch.h"
 #include "shape.h"
 
-Shape::Shape(PureShape ps) {
+Shape::Shape(PureShape ps, vector<float>* expressionsCoefficientsPtr, vector<bool>* expressionsSelectionPtr) {
 	sourcePureShape = ps;
+
+	// If it's not then u're an idiot :)
+	int vertsSize = shapeSizesPerShapeIndex[ps.index].verts;
+	int linesSize = shapeSizesPerShapeIndex[ps.index].lines;
+	int expressionSize = shapeSizesPerShapeIndex[ps.index].expressions;
 
 	const int locsSize = ps.locs.size();
 	const int locsMiddlesSize = ps.locsMiddles.size();
@@ -58,10 +62,7 @@ Shape::Shape(PureShape ps) {
 	if (not ps.isCyclic) {
 		float2 v[2] = { (ps.locsMiddles[0] - ps.locs[0]).getNormalized() * 2 + ps.locs[0], ps.locsMiddles[0] };
 		float2 vf[2] = { (locsMiddlesFadeout[0] - locsFadeout[0]).getNormalized() * 2 + locsFadeout[0], locsMiddlesFadeout[0] };
-		Segment<false> s (v, vf);
-
-		expressionsCoefficients.push_back(s.expressionCoefficients);
-		expressionsSelection.push_back(s.expressionSelection);
+		Segment<false> s (v, vf, expressionsCoefficientsPtr, expressionsSelectionPtr);
 
 		vertsIn.push_back(s.vertsIn[0]);
 		vertsOut.push_back(s.vertsOut[0]);
@@ -73,18 +74,11 @@ Shape::Shape(PureShape ps) {
 	}
 	// Arc segments
 	for (int arcIndex = not ps.isCyclic; arcIndex < locsSize + (not ps.isCyclic); arcIndex++) {
-		//for (auto e : ps.locsMiddles) {
-		//	cout << e.getString();
-		//}
-
 		int j = (arcIndex - 1 + locsSize) % locsSize;
 		float2 v[3] = { ps.locsMiddles[j], ps.locs[arcIndex - (not ps.isCyclic)], ps.locsMiddles[arcIndex] };
 		float2 vf[3] = { locsMiddlesFadeout[j], locsFadeout[arcIndex - (not ps.isCyclic)], locsMiddlesFadeout[arcIndex] };
 
-		Segment<true> s (v, vf);
-
-		expressionsCoefficients.push_back(s.expressionCoefficients);
-		expressionsSelection.push_back(s.expressionSelection);
+		Segment<false> s(v, vf, expressionsCoefficientsPtr, expressionsSelectionPtr);
 
 		// Defining lines.
 		lineDefine(s.vertsIn[1], &vertsIn, linesIn, s.vertsOut[1], VERT_TYPE::IN, arcIndex + 2, 0, leftestVertX, defaultExpressionIndex);
@@ -96,8 +90,6 @@ Shape::Shape(PureShape ps) {
 		lineBetweenDefine(vertsIn.size() - 1, vertsOut.size() - 1, &vertsIn, &vertsOut, linesBetween,
 			(s.isVertsInTriple ? s.vertsIn : s.vertsOut)[1],
 			arcIndex + 2, arcIndex + 3);
-
-		//cout << "CURRENT V SIZES: " << vertsIn.size() << " " << vertsOut.size() << endl;
 	}
 
 	// Fixing the wrong index of first added lines.
@@ -110,21 +102,13 @@ Shape::Shape(PureShape ps) {
 	if (not ps.isCyclic) {
 		float2 v[2] = { ps.locsMiddles[locsMiddlesSize - 1], (ps.locsMiddles[locsMiddlesSize - 1] - ps.locs[locsSize - 1]).getNormalized() * 2 + ps.locs[locsSize - 1] };
 		float2 vf[2] = { locsMiddlesFadeout[locsMiddlesSize - 1], (locsMiddlesFadeout[locsMiddlesSize - 1] - locsFadeout[locsSize - 1]).getNormalized() * 2 + locsFadeout[locsSize - 1] };
-		Segment<false> s (v, vf);
-
-		expressionsCoefficients.push_back(s.expressionCoefficients);
-		expressionsSelection.push_back(s.expressionSelection);
+		Segment<false> s(v, vf, expressionsCoefficientsPtr, expressionsSelectionPtr);
 
 		lineDefine(s.vertsIn[1], &vertsIn, linesIn, s.vertsOut[1], VERT_TYPE::IN, locsSize + 3, 0, leftestVertX, defaultExpressionIndex);
 		lineDefine(s.vertsOut[1], &vertsOut, linesOut, s.vertsIn[1], VERT_TYPE::OUT, locsSize + 3, 1, leftestVertX, defaultExpressionIndex);
 		lineBetweenDefine(vertsIn.size() - 1, vertsOut.size() - 1, &vertsIn, &vertsOut, linesBetween, s.vertsIn[0], locsSize + 3, locsSize + 2); // 0 coz we doesn't care about exp otherwise.
 	}
 	////
-
-	// If it's not then u're an idiot :)
-	//vertsSize = 3 * locsSize + (not ps.isCyclic) * 6;
-	//linesSize = 4 * locsSize + (not ps.isCyclic) * 7;
-	//expressionSize = locsSize + 2 + (not ps.isCyclic) * 2;
 
 	if (vertsIn.size() + vertsOut.size() != vertsSize) cout << "PIZDA " << vertsIn.size() << " " << vertsOut.size() << " " << vertsSize << endl;
 	if (linesIn.size() + linesOut.size() + linesBetween.size() != linesSize) cout << "PIZDA " << linesIn.size() << " " << linesOut.size() << " " << linesBetween.size() << " " << linesSize << endl;
@@ -149,20 +133,6 @@ Shape::Shape(PureShape ps) {
 			linesRouglyGlued[i].sideVert, linesRouglyGlued[i].expressionIndexFit, linesRouglyGlued[i].expressionIndexOtherwise)
 		};
 	};
-	
-	cout << "expressionsCoefficients" << endl;
-	for (int i = 0; i < expressionSize; i++) {
-		cout << i << ". \t";
-		for (int j = 0; j < 10; j++) cout << expressionsCoefficients[i][j] << " \t";
-		cout << endl;
-	}
-
-	cout << "expressionsSelection" << endl;
-	for (int i = 0; i < expressionSize; i++) {
-		cout << i << ". \t";
-		for (int j = 0; j < 3; j++) cout << expressionsSelection[i][j] << " \t";
-		cout << endl;
-	}
 
 	int a = 0;
 	cin >> a;
@@ -195,7 +165,6 @@ int Shape::getProperExp(const float2& lineVert1, const float2& lineVert2, const 
 }
 
 void Shape::lineDefine(
-	// float2& vert1,
 	float2& vert2,
 	vector<float2>* vertsPtr,
 	vector<lineSided>& lines,
@@ -205,9 +174,7 @@ void Shape::lineDefine(
 	int expressionIndexOtherwise,
 	float& leftestVertX,
 	bool& defaultExpressionIndex
-	//bool isFirstSegment
 ) {
-	//cout << "IS FIRST: " << isFirstSegment << endl;
 	int vertsSize = vertsPtr->size();
 
 	lineSided newLine = {
