@@ -11,7 +11,11 @@
 #define BACKEND_H
 #define DLL_EXPORT __declspec(dllexport)
 
-extern "C" DLL_EXPORT float tick(float* expCoefficients, int expCoefficientsSize, float v, float h);
+extern "C" {
+	void DLL_EXPORT CMSGetShapesSizes(int* shapesSize, int* vertsSize, int* linesSize, int* expressionsSize);
+	void DLL_EXPORT CMSGetPersonalShapesSizes(int* shapesSizes)
+	void DLL_EXPORT CMSTick(float v, float h, bool* expressionSelectionsPerShape, float* expressionsCoefficientsPerShape);
+}
 
 #endif
 
@@ -30,5 +34,5 @@ namespace CMS {
 		float hAngle);
 
 	// angleVertical = [0-1 (means 0-180)]		angleHorizontal = [0-1 (means 0-360)]
-	void tick(float angleVertical, float angleHorizontal);
+	void tick(float v, float h, bool* expressionSelectionsPerShape, float* expressionsCoefficientsPerShape);
 };

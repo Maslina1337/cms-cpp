@@ -1,12 +1,16 @@
 //#include "pch.h"
 #include "general.h"
 
-float tick(float* expCoefficients, int expCoefficientsSize, float v, float h) { CMS::tick(v, h); return v; };
+void CMSGetShapesSizes(int* shapesSize, int* vertsSize, int* linesSize, int* expressionsSize) {};
+void CMSGetPersonalShapesSizes(int* shapesSizes) {};
+void CMSTick(float v, float h, bool* expressionSelectionsPerShape, float* expressionsCoefficientsPerShape) { 
+	CMS::tick(v, h, expressionSelectionsPerShape, expressionsCoefficientsPerShape);
+};
 
-int main() {
-	CMS::tick(0.5f, 0.5f);
-	return 0;
-}
+//int main() {
+//	CMS::tick(0.5f, 0.5f, nullptr, nullptr);
+//	return 0;
+//}
 
 namespace CMS {
 	void getNeighborsIndices(int& prevIndex, int& nextIndex, const float ofAngle, const float* inAngles, const int inAnglesSize, const bool isSeamless) {
@@ -98,8 +102,13 @@ namespace CMS {
 		
 	}
 
-	// angleVertical = [0-1 (means 0-180)]		angleHorizontal = [0-1 (means 0-360)]
-	void tick(float angleVertical, float angleHorizontal) {
+	// v = [0-1 (means 0-180)]		h = [0-1 (means 0-360)]
+	void tick(float v, float h, bool* expressionsSelectionsPerShape, float* expressionsCoefficientsPerShape) {
+
+		// Raw Expressions.
+		vector<array<float, 10>> expressionsCoefficients = { {0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, {1, 0, 0, 0, 0, 0, 0, 0, 0, 0} };
+		vector<array<bool, 3>> expressionsSelections = { {true, false, false}, {true, false, false} };
+
 		for (int sIndex = 0; sIndex < shapesSize; sIndex++) {
 
 			// Vertical layer
@@ -108,7 +117,7 @@ namespace CMS {
 
 			int prevIndexV;
 			int nextIndexV;
-			getNeighborsIndices(prevIndexV, nextIndexV, angleVertical, verticalLayerAngles, verticalLayerSize, false);
+			getNeighborsIndices(prevIndexV, nextIndexV, v, verticalLayerAngles, verticalLayerSize, false);
 
 			// Horizontal layer (lower)
 			const int horizontalLayerLowerSize = pureShapes[sIndex].pureShapes[prevIndexV].size;
@@ -116,7 +125,7 @@ namespace CMS {
 
 			int prevIndexHL;
 			int nextIndexHL;
-			getNeighborsIndices(prevIndexHL, nextIndexHL, angleHorizontal, horizontalLayerLowerAngles, horizontalLayerLowerSize);
+			getNeighborsIndices(prevIndexHL, nextIndexHL, h, horizontalLayerLowerAngles, horizontalLayerLowerSize);
 
 			// Horizontal layer (higher)
 			const int horizontalLayerHigherSize = pureShapes[sIndex].pureShapes[nextIndexV].size;
@@ -124,7 +133,7 @@ namespace CMS {
 
 			int prevIndexHH;
 			int nextIndexHH;
-			getNeighborsIndices(prevIndexHH, nextIndexHH, angleHorizontal, horizontalLayerHigherAngles, horizontalLayerHigherSize);
+			getNeighborsIndices(prevIndexHH, nextIndexHH, h, horizontalLayerHigherAngles, horizontalLayerHigherSize);
 
 			PureShape* pureShapeLowPrevPtr = pureShapes[sIndex].pureShapes[prevIndexV].pureShapes[prevIndexHL];
 			PureShape* pureShapeLowNextPtr = pureShapes[sIndex].pureShapes[prevIndexV].pureShapes[nextIndexHL];
@@ -136,23 +145,27 @@ namespace CMS {
 				horizontalLayerLowerAngles[nextIndexHL],
 				pureShapes[sIndex].pureShapes[prevIndexV].pureShapes[prevIndexHL],
 				pureShapes[sIndex].pureShapes[prevIndexV].pureShapes[nextIndexHL],
-				angleHorizontal);
+				h);
 
 			PureShape nextMergeH = mergePureShapesHorizontally(
 				horizontalLayerHigherAngles[prevIndexHL],
 				horizontalLayerLowerAngles[nextIndexHL],
 				pureShapes[sIndex].pureShapes[nextIndexV].pureShapes[prevIndexHH],
 				pureShapes[sIndex].pureShapes[nextIndexV].pureShapes[nextIndexHH],
-				angleHorizontal);
+				h);
 
-			cout << "FACTOR V " << ((angleVertical - verticalLayerAngles[prevIndexV]) /
+			cout << "FACTOR V " << ((v - verticalLayerAngles[prevIndexV]) /
 				(verticalLayerAngles[nextIndexV] - verticalLayerAngles[prevIndexV]));
 
 			PureShape resultMerge = mergePureShapes(prevMergeH, nextMergeH,
-				(angleVertical - verticalLayerAngles[prevIndexV]) /
+				(v - verticalLayerAngles[prevIndexV]) /
 				(verticalLayerAngles[nextIndexV] - verticalLayerAngles[prevIndexV]));
 
-			Shape dev (resultMerge);
+			Shape s (resultMerge);
+
+			for (int i = 0; i < 10; i++) {
+				*((10 * sIndex) + expressionsSelectionsPerShape + i) = s.expressionsCoefficients[i];
+			}
 		}
 	}
 };

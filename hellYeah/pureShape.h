@@ -17,9 +17,17 @@ struct PureShape {
 	float fadeoutAngle;
 	float fadeoutLength;
 
+	int index;
+
 	//const int* const vertsSizePtr;
 	//const int* const linesSizePtr;
 	//const int* const expressionSizePtr;
+};
+
+struct shapeSizes {
+	int verts;
+	int lines;
+	int expressions;
 };
 
 template<typename type>

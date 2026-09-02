@@ -35,8 +35,8 @@ public:
 	bool isVertsInTriple;
 	bool isVertsOutTriple;
 
-	array<bool, 3> expressionSelection = { false, false, false }; // Raw, Quadratic, Constant, otherwise Linear
-	array<float, 10> expressionCoefficients = { 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f };
+	bool expressionSelection[3] = {false, false, false}; // Raw, Quadratic, Constant, otherwise Linear
+	float expressionCoefficients[10] = {0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f};
 
 	Segment(float2 v[2 + isTriple], float2 vf[2 + isTriple]) {
 		int size = 2 + isTriple;
@@ -47,15 +47,6 @@ public:
 		vog[1][0] = vf[0];
 		vog[1][1] = vf[1];
 		if constexpr (isTriple) { vog[1][2] = vf[2]; }
-
-		float2 v12 = v[1] - v[0];
-		
-		float2 v23;
-		float2 v13;
-		if constexpr (isTriple) {
-			v23 = v[2] - v[1];
-			v13 = v[2] - v[0];
-		}
 
 		// Straight case. // TODO: Can be copyed to const exp above.
 		if (not isTriple)
@@ -98,6 +89,10 @@ public:
 		}
 
 		// Following Code is only for triple non-straight segments.
+
+		float2 v12 = v[1] - v[0];
+		float2 v23 = v[2] - v[1];
+		float2 v13 = v[2] - v[0];
 
 		// TODO: Merge the reorder and pointsDefine methods.
 		pointsDefine(v, false);

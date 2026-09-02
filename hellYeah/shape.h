@@ -63,8 +63,8 @@ private:
 	vector<array<int, 2>> bothExpsPerInterVert;
 
 	// TODO: Maybe vectors to arrays??
-	vector<array<float, 10>> expressionsCoefficients = { { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }, { 1, 0, 0, 0, 0, 0, 0, 0, 0, 0 } };
-	vector<array<bool, 3>> expressionsSelection = { { true, false, false }, { true, false, false } };
+	vector<array<float, 10>> expressionsCoefficients = {{0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, {1, 0, 0, 0, 0, 0, 0, 0, 0, 0}};
+	vector<array<bool, 3>> expressionsSelection = {{true, false, false}, {true, false, false}};
 
 public:
 	Shape(PureShape ps);

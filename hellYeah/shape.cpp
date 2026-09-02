@@ -31,24 +31,24 @@ Shape::Shape(PureShape ps) {
 		};
 	}
 
-	cout << endl << "LOCS" << endl;
-	for (int i = 0; i < ps.locs.size(); i++) {
-		cout << ps.locs[i].getString() << endl;
-	}
-	cout << endl << "LOCS MIDDLES" << endl;
-	for (int i = 0; i < ps.locsMiddles.size(); i++) {
-		cout << ps.locsMiddles[i].getString() << endl;
-	}
+	//cout << endl << "LOCS" << endl;
+	//for (int i = 0; i < ps.locs.size(); i++) {
+	//	cout << ps.locs[i].getString() << endl;
+	//}
+	//cout << endl << "LOCS MIDDLES" << endl;
+	//for (int i = 0; i < ps.locsMiddles.size(); i++) {
+	//	cout << ps.locsMiddles[i].getString() << endl;
+	//}
 
-	cout << endl << "FADEOUT" << endl;
-	for (int i = 0; i < locsSize; i++) {
-		cout << locsFadeout[i].getString() << endl;
-	}
+	//cout << endl << "FADEOUT" << endl;
+	//for (int i = 0; i < locsSize; i++) {
+	//	cout << locsFadeout[i].getString() << endl;
+	//}
 
-	cout << endl << "FADEOUT MIDDLE" << endl;
-	for (int i = 0; i < locsMiddlesSize; i++) {
-		cout << locsMiddlesFadeout[i].getString() << endl;
-	}
+	//cout << endl << "FADEOUT MIDDLE" << endl;
+	//for (int i = 0; i < locsMiddlesSize; i++) {
+	//	cout << locsMiddlesFadeout[i].getString() << endl;
+	//}
 
 	float leftestVertX;
 
@@ -122,9 +122,9 @@ Shape::Shape(PureShape ps) {
 	////
 
 	// If it's not then u're an idiot :)
-	vertsSize = 3 * locsSize + (not ps.isCyclic) * 6;
-	linesSize = 4 * locsSize + (not ps.isCyclic) * 7;
-	expressionSize = locsSize + 2 + (not ps.isCyclic) * 2;
+	//vertsSize = 3 * locsSize + (not ps.isCyclic) * 6;
+	//linesSize = 4 * locsSize + (not ps.isCyclic) * 7;
+	//expressionSize = locsSize + 2 + (not ps.isCyclic) * 2;
 
 	if (vertsIn.size() + vertsOut.size() != vertsSize) cout << "PIZDA " << vertsIn.size() << " " << vertsOut.size() << " " << vertsSize << endl;
 	if (linesIn.size() + linesOut.size() + linesBetween.size() != linesSize) cout << "PIZDA " << linesIn.size() << " " << linesOut.size() << " " << linesBetween.size() << " " << linesSize << endl;
