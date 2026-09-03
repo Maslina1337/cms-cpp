@@ -7,12 +7,12 @@
 
 using namespace std;
 
-enum EXPRESSION_SELECTION {
-	RAW,
-	QUADRATIC,
-	CONSTANT,
-	// Otherwise Linear
-};
+//enum EXPRESSION_SELECTION {
+//	RAW,
+//	QUADRATIC,
+//	CONSTANT,
+//	// Otherwise Linear
+//};
 
 //	NOTHING = [True, False, False]     # Coefficients : [0]
 //	EVERYTHING = [True, False, False]  # Coefficients : [1]
@@ -71,10 +71,22 @@ public:
 				float constY = 1 / a;
 			}
 
-			expressionSelection[EXPRESSION_SELECTION::CONSTANT] = true;
-			expressionCoefficients[0] = constX;
-			expressionCoefficients[1] = constY;
-			expressionCoefficients[2] = constScalar;
+			// CONSTANT
+			expressionsSelectionPtr->push_back(false);
+			expressionsSelectionPtr->push_back(false);
+			expressionsSelectionPtr->push_back(true);
+
+			expressionsCoefficientsPtr->push_back(constX);
+			expressionsCoefficientsPtr->push_back(constY);
+			expressionsCoefficientsPtr->push_back(constScalar);
+			expressionsCoefficientsPtr->push_back(0.0f);
+			expressionsCoefficientsPtr->push_back(0.0f);
+			expressionsCoefficientsPtr->push_back(0.0f);
+			expressionsCoefficientsPtr->push_back(0.0f);
+			expressionsCoefficientsPtr->push_back(0.0f);
+			expressionsCoefficientsPtr->push_back(0.0f);
+			expressionsCoefficientsPtr->push_back(0.0f);
+
 			return;
 		}
 
@@ -177,14 +189,14 @@ public:
 		const float c_y2 = U49;
 		const float c_xy = U127;
 
-		expressionCoefficients[0] = b_x;
-		expressionCoefficients[1] = b_y;
-		expressionCoefficients[2] = b_s;
-		expressionCoefficients[3] = c_x2;
-		expressionCoefficients[4] = c_y2;
-		expressionCoefficients[5] = c_xy;
-		expressionCoefficients[6] = center[0].x;
-		expressionCoefficients[7] = center[0].y;
+		expressionsCoefficientsPtr->push_back(b_x);
+		expressionsCoefficientsPtr->push_back(b_y);
+		expressionsCoefficientsPtr->push_back(b_s);
+		expressionsCoefficientsPtr->push_back(c_x2);
+		expressionsCoefficientsPtr->push_back(c_y2);
+		expressionsCoefficientsPtr->push_back(c_xy);
+		expressionsCoefficientsPtr->push_back(center[0].x);
+		expressionsCoefficientsPtr->push_back(center[0].y);
 
 		if (a_ != 0)
 		{
@@ -200,10 +212,22 @@ public:
 			// Is first member closer to zero factor (influence).
 			bool useFirstMember = abs(F1__) < abs(F2__);
 
-			expressionSelection[EXPRESSION_SELECTION::QUADRATIC] = true;
+			// QUADRATIC
+			expressionsSelectionPtr->push_back(false);
+			expressionsSelectionPtr->push_back(true);
+			expressionsSelectionPtr->push_back(false);
 
-			expressionCoefficients[8] = a_m_2;
-			expressionCoefficients[9] = useFirstMember ? 1 : 0;
+			expressionsCoefficientsPtr->push_back(a_m_2);
+			expressionsCoefficientsPtr->push_back(useFirstMember);
+		}
+		else {
+			// LINEAR
+			expressionsSelectionPtr->push_back(false);
+			expressionsSelectionPtr->push_back(false);
+			expressionsSelectionPtr->push_back(false);
+
+			expressionsCoefficientsPtr->push_back(0.0f);
+			expressionsCoefficientsPtr->push_back(0.0f);
 		}
 	};
 

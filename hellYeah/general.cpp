@@ -1,7 +1,12 @@
 //#include "pch.h"
 #include "general.h"
 
-void CMSGetShapesSizes(int* shapesSize, int* vertsSize, int* linesSize, int* expressionsSize) {};
+void CMSGetShapesSizes(int* shapesSize_, int* vertsSize_, int* linesSize_, int* expressionsSize_) {
+	(*shapesSize_) = shapesSize;
+	(*vertsSize_) = vertsSize;
+	(*linesSize_) = linesSize;
+	(*expressionsSize_) = expressionsSize;
+};
 void CMSGetPersonalShapesSizes(int* shapesSizes) {};
 void CMSTick(float v, float h, bool* expressionSelectionsPerShape, float* expressionsCoefficientsPerShape) { 
 	CMS::tick(v, h, expressionSelectionsPerShape, expressionsCoefficientsPerShape);
