@@ -1,21 +1,46 @@
 //#include "pch.h"
 #include "general.h"
 
-void CMSGetShapesSizes(int* shapesSize_, int* vertsSize_, int* linesSize_, int* expressionsSize_) {
-	(*shapesSize_) = shapesSize;
-	(*vertsSize_) = vertsSize;
-	(*linesSize_) = linesSize;
-	(*expressionsSize_) = expressionsSize;
-};
-void CMSGetPersonalShapesSizes(int* shapesSizes) {};
-void CMSTick(float v, float h, bool* expressionSelectionsPerShape, float* expressionsCoefficientsPerShape) { 
-	CMS::tick(v, h, expressionSelectionsPerShape, expressionsCoefficientsPerShape);
+//void CMSGetShapesSizes(int* shapesSize_, int* vertsSize_, int* linesSize_, int* expressionsSize_) {
+//	*shapesSize_ = shapesSize;
+//	*vertsSize_ = vertsSize;
+//	*linesSize_ = linesSize;
+//	*expressionsSize_ = expressionsSize;
+//};
+// void CMSGetPersonalShapesSizes(int* shapesSizes) {};
+void CMSTick(float v, float h, float* vertsPtr, float* linesPtr, float* expressionsCoefficientsPtr, float* expressionsSelectionsPtr) {
+	// Valid test.
+	//if (
+	//	expressionsSelectionsPtr == nullptr 
+	//	or expressionsCoefficientsPtr == nullptr 
+	//	or expressionsCoefficientsSize != (expressionsSize + 2) * 10
+	//	or expressionsSelectionsSize != (expressionsSize + 2)
+	//) return;
+
+	//expressionsSelectionsPtr[0] = true;
+	//expressionsSelectionsPtr[9] = true;
+	//return;
+	CMS::tick(v, h, expressionsCoefficientsPtr, expressionsSelectionsPtr);
 };
 
-int main() {
-	CMS::tick(0.5f, 0.5f, nullptr, nullptr);
-	return 0;
-}
+//int main() {
+//	bool* expressionsSelectionsPtr = new bool[(expressionsSize + 2) * 3];
+//	float* expressionsCoefficientsPtr = new float[(expressionsSize + 2) * 10];
+//
+//	CMS::tick(0.5f, 0.5f, expressionsCoefficientsPtr, expressionsSelectionsPtr);
+//
+//	for (int i = 0; i < (expressionsSize + 2) * 10; i++) {
+//		if (i % 10 == 0) cout << endl;
+//		cout << expressionsCoefficientsPtr[i] << " ";
+//	}
+//
+//	for (int i = 0; i < (expressionsSize + 2) * 3; i++) {
+//		if (i % 3 == 0) cout << endl;
+//		cout << expressionsSelectionsPtr[i] << " ";
+//	}
+//
+//	return 0;
+//}
 
 namespace CMS {
 	void getNeighborsIndices(int& prevIndex, int& nextIndex, const float ofAngle, const float* inAngles, const int inAnglesSize, const bool isSeamless) {
@@ -102,21 +127,35 @@ namespace CMS {
 	}
 
 	// v = [0-1 (means 0-180)]		h = [0-1 (means 0-360)]
-	void tick(float v, float h, bool* expressionsSelectionsOutcome, float* expressionsCoefficientsOutcome) {
+	void tick(float v, float h, float* expressionsCoefficientsPtr, float* expressionsSelectionsPtr) {
 
 		// Raw Expressions.
-		vector<float> expressionsCoefficients = { 
-			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
-			1, 0, 0, 0, 0, 0, 0, 0, 0, 0 
-		};
+		for (int i = 0; i < 20; i++) expressionsCoefficientsPtr[i] = 0.0f;
+		expressionsCoefficientsPtr[10] = 1.0f;
 
-		vector<bool> expressionsSelections = { 
-			true, false, false, 
-			true, false, false 
-		};
+		expressionsSelectionsPtr[0] = 0;
+		expressionsSelectionsPtr[1] = 0;
+		//expressionsSelectionsPtr[0] = true;
+		//expressionsSelectionsPtr[1] = false;
+		//expressionsSelectionsPtr[2] = false;
+		//expressionsSelectionsPtr[3] = true;
+		//expressionsSelectionsPtr[4] = false;
+		//expressionsSelectionsPtr[5] = false;
 
-		expressionsCoefficients.reserve((expressionsSize + 2) * 10);
-		expressionsSelections.reserve((expressionsSize + 2) * 3);
+		//vector<float> expressionsCoefficients = { 
+		//	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+		//	1, 0, 0, 0, 0, 0, 0, 0, 0, 0 
+		//};
+
+		//vector<bool> expressionsSelections = { 
+		//	true, false, false, 
+		//	true, false, false 
+		//};
+
+		int segmentsCompleted = 2;
+
+		//expressionsCoefficients.reserve((expressionsSize + 2) * 10);
+		//expressionsSelections.reserve((expressionsSize + 2) * 3);
 
 		for (int sIndex = 0; sIndex < shapesSize; sIndex++) {
 
@@ -155,23 +194,24 @@ namespace CMS {
 				pureShapes[sIndex].pureShapes[prevIndexV].pureShapes[prevIndexHL],
 				pureShapes[sIndex].pureShapes[prevIndexV].pureShapes[nextIndexHL],
 				h);
+			
+			if (verticalLayerAngles[nextIndexV] == verticalLayerAngles[prevIndexV]) {
+				Shape s(prevMergeH, expressionsCoefficientsPtr, expressionsSelectionsPtr, segmentsCompleted);
+			}
+			else {
+				PureShape nextMergeH = mergePureShapesHorizontally(
+					horizontalLayerHigherAngles[prevIndexHL],
+					horizontalLayerLowerAngles[nextIndexHL],
+					pureShapes[sIndex].pureShapes[nextIndexV].pureShapes[prevIndexHH],
+					pureShapes[sIndex].pureShapes[nextIndexV].pureShapes[nextIndexHH],
+					h);
 
-			PureShape nextMergeH = mergePureShapesHorizontally(
-				horizontalLayerHigherAngles[prevIndexHL],
-				horizontalLayerLowerAngles[nextIndexHL],
-				pureShapes[sIndex].pureShapes[nextIndexV].pureShapes[prevIndexHH],
-				pureShapes[sIndex].pureShapes[nextIndexV].pureShapes[nextIndexHH],
-				h);
+				PureShape resultMerge = mergePureShapes(prevMergeH, nextMergeH, (v - verticalLayerAngles[prevIndexV]) /
+					(verticalLayerAngles[nextIndexV] - verticalLayerAngles[prevIndexV]));
+				Shape s(resultMerge, expressionsCoefficientsPtr, expressionsSelectionsPtr, segmentsCompleted);
+			}
 
-			PureShape resultMerge = mergePureShapes(prevMergeH, nextMergeH,
-				(v - verticalLayerAngles[prevIndexV]) /
-				(verticalLayerAngles[nextIndexV] - verticalLayerAngles[prevIndexV]));
-
-			Shape s (resultMerge, &expressionsCoefficients, &expressionsSelections);
-
-			//for (int i = 0; i < 10; i++) {
-			//	*((10 * sIndex) + expressionsSelectionsPerShape + i) = s.expressionsCoefficients[i];
-			//}
+			
 		}
 	}
 };

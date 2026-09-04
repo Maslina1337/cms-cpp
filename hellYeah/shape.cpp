@@ -1,6 +1,6 @@
 #include "shape.h"
 
-Shape::Shape(PureShape ps, vector<float>* expressionsCoefficientsPtr, vector<bool>* expressionsSelectionPtr) {
+Shape::Shape(PureShape ps, float* expressionsCoefficientsPtr, float* expressionsSelectionPtr, int& segmentsCompleted) {
 	sourcePureShape = ps;
 
 	// If it's not then u're an idiot :)
@@ -56,13 +56,20 @@ Shape::Shape(PureShape ps, vector<float>* expressionsCoefficientsPtr, vector<boo
 
 	float leftestVertX;
 
-	//// Creating segments
+	vector<float2> vertsIn;
+	vector<float2> vertsOut;
+
+	vector<lineSided> linesIn;
+	vector<lineSided> linesOut;
+	vector<lineSided> linesBetween;
+
+	bool defaultExpressionIndex = 0;
 
 	// First segment.
 	if (not ps.isCyclic) {
 		float2 v[2] = { (ps.locsMiddles[0] - ps.locs[0]).getNormalized() * 2 + ps.locs[0], ps.locsMiddles[0] };
 		float2 vf[2] = { (locsMiddlesFadeout[0] - locsFadeout[0]).getNormalized() * 2 + locsFadeout[0], locsMiddlesFadeout[0] };
-		Segment<false> s (v, vf, expressionsCoefficientsPtr, expressionsSelectionPtr);
+		Segment<false> s (v, vf, expressionsCoefficientsPtr, expressionsSelectionPtr, segmentsCompleted);
 
 		vertsIn.push_back(s.vertsIn[0]);
 		vertsOut.push_back(s.vertsOut[0]);
@@ -77,8 +84,7 @@ Shape::Shape(PureShape ps, vector<float>* expressionsCoefficientsPtr, vector<boo
 		int j = (arcIndex - 1 + locsSize) % locsSize;
 		float2 v[3] = { ps.locsMiddles[j], ps.locs[arcIndex - (not ps.isCyclic)], ps.locsMiddles[arcIndex] };
 		float2 vf[3] = { locsMiddlesFadeout[j], locsFadeout[arcIndex - (not ps.isCyclic)], locsMiddlesFadeout[arcIndex] };
-
-		Segment<false> s(v, vf, expressionsCoefficientsPtr, expressionsSelectionPtr);
+		Segment<true> s(v, vf, expressionsCoefficientsPtr, expressionsSelectionPtr, segmentsCompleted);
 
 		// Defining lines.
 		lineDefine(s.vertsIn[1], &vertsIn, linesIn, s.vertsOut[1], VERT_TYPE::IN, arcIndex + 2, 0, leftestVertX, defaultExpressionIndex);
@@ -92,26 +98,28 @@ Shape::Shape(PureShape ps, vector<float>* expressionsCoefficientsPtr, vector<boo
 			arcIndex + 2, arcIndex + 3);
 	}
 
-	// Fixing the wrong index of first added lines.
-	if (ps.isCyclic) {
-		linesIn[0].from = vertsIn.size() - 1;
-		linesOut[0].from = vertsOut.size() - 1;
-	}
-
 	// Last segment.
 	if (not ps.isCyclic) {
 		float2 v[2] = { ps.locsMiddles[locsMiddlesSize - 1], (ps.locsMiddles[locsMiddlesSize - 1] - ps.locs[locsSize - 1]).getNormalized() * 2 + ps.locs[locsSize - 1] };
 		float2 vf[2] = { locsMiddlesFadeout[locsMiddlesSize - 1], (locsMiddlesFadeout[locsMiddlesSize - 1] - locsFadeout[locsSize - 1]).getNormalized() * 2 + locsFadeout[locsSize - 1] };
-		Segment<false> s(v, vf, expressionsCoefficientsPtr, expressionsSelectionPtr);
+		Segment<false> s(v, vf, expressionsCoefficientsPtr, expressionsSelectionPtr, segmentsCompleted);
 
 		lineDefine(s.vertsIn[1], &vertsIn, linesIn, s.vertsOut[1], VERT_TYPE::IN, locsSize + 3, 0, leftestVertX, defaultExpressionIndex);
 		lineDefine(s.vertsOut[1], &vertsOut, linesOut, s.vertsIn[1], VERT_TYPE::OUT, locsSize + 3, 1, leftestVertX, defaultExpressionIndex);
-		lineBetweenDefine(vertsIn.size() - 1, vertsOut.size() - 1, &vertsIn, &vertsOut, linesBetween, s.vertsIn[0], locsSize + 3, locsSize + 2); // 0 coz we doesn't care about exp otherwise.
+		lineBetweenDefine(vertsIn.size() - 1, vertsOut.size() - 1, &vertsIn, &vertsOut, linesBetween, s.vertsIn[0], locsSize + 3, locsSize + 2);
 	}
-	////
 
-	if (vertsIn.size() + vertsOut.size() != vertsSize) cout << "PIZDA " << vertsIn.size() << " " << vertsOut.size() << " " << vertsSize << endl;
-	if (linesIn.size() + linesOut.size() + linesBetween.size() != linesSize) cout << "PIZDA " << linesIn.size() << " " << linesOut.size() << " " << linesBetween.size() << " " << linesSize << endl;
+	if (ps.isCyclic) {
+		// Fixing the wrong index of first added lines.
+		linesIn[0].from = vertsIn.size() - 1;
+		linesOut[0].from = vertsOut.size() - 1;
+
+		// Flipping default. TODO: Discover why it's flipped.
+		defaultExpressionIndex = 1 - defaultExpressionIndex;
+	}
+
+	if (vertsIn.size() + vertsOut.size() != vertsSize) cout << "PIZDA V " << vertsIn.size() << " " << vertsOut.size() << " " << vertsSize << endl;
+	if (linesIn.size() + linesOut.size() + linesBetween.size() != linesSize) cout << "PIZDA L " << linesIn.size() << " " << linesOut.size() << " " << linesBetween.size() << " " << linesSize << endl;
 
 	vector<float2> verts = vertsIn;
 	verts.reserve(vertsSize);
@@ -133,9 +141,6 @@ Shape::Shape(PureShape ps, vector<float>* expressionsCoefficientsPtr, vector<boo
 			linesRouglyGlued[i].sideVert, linesRouglyGlued[i].expressionIndexFit, linesRouglyGlued[i].expressionIndexOtherwise)
 		};
 	};
-
-	int a = 0;
-	cin >> a;
 };
 
 bool Shape::isVertOnLeftOfLine(const float2& lineVert1, const float2& lineVert2, const float2& sideVert) const {

@@ -13,9 +13,9 @@
 #define DLL_EXPORT __declspec(dllexport)
 
 extern "C" {
-	void DLL_EXPORT CMSGetShapesSizes(int* shapesSize, int* vertsSize, int* linesSize, int* expressionsSize);
-	void DLL_EXPORT CMSGetPersonalShapesSizes(int* shapesSizes);
-	void DLL_EXPORT CMSTick(float v, float h, bool* expressionSelectionsPerShape, float* expressionsCoefficientsPerShape);
+	// void DLL_EXPORT CMSGetShapesSizes(int* shapesSize, int* vertsSize, int* linesSize, int* expressionsSize);
+	// void DLL_EXPORT CMSGetPersonalShapesSizes(int* shapesSizes);
+	void DLL_EXPORT CMSTick(float v, float h, float* vertsPtr, float* linesPtr, float* expressionsCoefficientsPtr, float* expressionsSelectionsPtr);
 }
 
 #endif
@@ -35,5 +35,5 @@ namespace CMS {
 		float hAngle);
 
 	// angleVertical = [0-1 (means 0-180)]		angleHorizontal = [0-1 (means 0-360)]
-	void tick(float v, float h, bool* expressionSelectionsPerShape, float* expressionsCoefficientsPerShape);
+	void tick(float v, float h, float* expressionsCoefficientsPtr, float* expressionsSelectionsPtr);
 };

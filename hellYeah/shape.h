@@ -40,21 +40,8 @@ class Shape {
 public:
 	PureShape sourcePureShape;
 
-	vector<array<float, 10>> expressionsCoefficients = {};
-	vector<array<bool, 3>> expressionsSelection = {};
-
-private:
-	vector<float2> vertsIn;
-	vector<float2> vertsOut;
-
-	vector<lineSided> linesIn;
-	vector<lineSided> linesOut;
-	vector<lineSided> linesBetween;
-
-	bool defaultExpressionIndex = 0;
-
 public:
-	Shape(PureShape ps, vector<float>* expressionsCoefficientsPtr, vector<bool>* expressionsSelectionPtr);
+	Shape(PureShape ps, float* expressionsCoefficientsPtr, float* expressionsSelectionPtr, int& segmentsCompleted);
 
 private:
 	bool isVertOnLeftOfLine(const float2& lineVert1, const float2& lineVert2, const float2& sideVert) const;
@@ -65,7 +52,6 @@ private:
 
 	// TODO: vert1 is useless in segments next to first one.
 	void lineDefine(
-		//float2& vert1,
 		float2& vert2,
 		vector<float2>* vertsPtr,
 		vector<lineSided>& lines,
@@ -75,7 +61,6 @@ private:
 		int expressionIndexOtherwise,
 		float& leftestVertX,
 		bool& defaultExpressionIndex
-		//bool isFirstSegment = false
 	);
 
 	void lineBetweenDefine(

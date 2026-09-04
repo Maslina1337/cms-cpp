@@ -95,28 +95,28 @@ static const int shapeWatVertical90HorizontalSize = 2;
 static const float shapeWatVertical90HorizontalLayers[shapeWatVertical90HorizontalSize] = { static_cast<float>(0.2222222222222222), static_cast<float>(0.3055555555555556) };
 
 static PureShape shapeWatVertical90Horizontal80PureShape = {
-        .locs = {float2(static_cast<float>(0.3333333432674408), static_cast<float>(0.3333333432674408)), float2(static_cast<float>(0.3333333432674408), static_cast<float>(0.1666666716337204))},
-        .locsMiddles = {float2(static_cast<float>(0.25), static_cast<float>(0.3333333432674408)), float2(static_cast<float>(0.3333333432674408), static_cast<float>(0.25)), float2(static_cast<float>(0.25), static_cast<float>(0.1666666716337204))},
-        .fadeoutScales = {static_cast<float>(2.9999996870756642), static_cast<float>(2.9999997597187757)},
+        .locs = {float2(static_cast<float>(0.32247239351272583), static_cast<float>(0.4403236508369446)), float2(static_cast<float>(0.4403235912322998), static_cast<float>(0.3224724531173706))},
+        .locsMiddles = {float2(static_cast<float>(0.2635469436645508), static_cast<float>(0.3813980519771576)), float2(static_cast<float>(0.3813979923725128), static_cast<float>(0.3813980519771576)), float2(static_cast<float>(0.38139808177948), static_cast<float>(0.2635469138622284))},
+        .fadeoutScales = {static_cast<float>(3.000002816322089), static_cast<float>(2.999999966472392)},
         .isSubtract = false,
         .isCyclic = false,
         .doIgnore = false,
         .opacity = static_cast<float>(1.0),
-        .fadeoutAngle = static_cast<float>(1.5707963267948966),
-        .fadeoutLength = static_cast<float>(0.16666665611167716),
+        .fadeoutAngle = static_cast<float>(2.356194220197019),
+        .fadeoutLength = static_cast<float>(0.1666666672875484),
         .index = 1
 };
 
 static PureShape shapeWatVertical90Horizontal110PureShape = {
-        .locs = {float2(static_cast<float>(0.3333333432674408), static_cast<float>(0.8333333730697632)), float2(static_cast<float>(0.3333333432674408), static_cast<float>(0.6666666865348816))},
-        .locsMiddles = {float2(static_cast<float>(0.25), static_cast<float>(0.8333333730697632)), float2(static_cast<float>(0.3333333432674408), static_cast<float>(0.75)), float2(static_cast<float>(0.25), static_cast<float>(0.6666666865348816))},
-        .fadeoutScales = {static_cast<float>(2.999999670311981), static_cast<float>(2.9999992959199617)},
+        .locs = {float2(static_cast<float>(0.44032371044158936), static_cast<float>(0.6775274276733398)), float2(static_cast<float>(0.3224725127220154), static_cast<float>(0.5596763491630554))},
+        .locsMiddles = {float2(static_cast<float>(0.3813980519771576), static_cast<float>(0.7364530563354492)), float2(static_cast<float>(0.38139817118644714), static_cast<float>(0.61860191822052)), float2(static_cast<float>(0.263546884059906), static_cast<float>(0.6186019778251648))},
+        .fadeoutScales = {static_cast<float>(2.9999995194375813), static_cast<float>(2.9999997206039657)},
         .isSubtract = false,
         .isCyclic = false,
         .doIgnore = false,
         .opacity = static_cast<float>(1.0),
-        .fadeoutAngle = static_cast<float>(1.5707963267948966),
-        .fadeoutLength = static_cast<float>(0.1666666281719958),
+        .fadeoutAngle = static_cast<float>(0.7853986019801082),
+        .fadeoutLength = static_cast<float>(0.16666669802119038),
         .index = 1
 };
 
@@ -132,6 +132,6 @@ static PureShapeLayer<PureShapeLayer<PureShape*>> pureShapes[shapesSize] = { sha
 
 static shapeSizes shapeSizesPerShapeIndex[shapesSize] = { shapeNoseShapeSizes, shapeWatShapeSizes };
 
-static int vertsSize = 24;
-static int linesSize = 31;
-static int expressionsSize = 8;
+static const int vertsSize = 24;
+static const int linesSize = 31;
+static const int expressionsSize = 8;
