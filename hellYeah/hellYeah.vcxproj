@@ -21,11 +21,14 @@
   <ItemGroup>
     <ClCompile Include="devUtils.h" />
     <ClCompile Include="general.cpp" />
+    <ClCompile Include="lodepng.cpp" />
+    <ClCompile Include="renderer.h" />
     <ClCompile Include="shape.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="float2.h" />
     <ClInclude Include="general.h" />
+    <ClInclude Include="lodepng.h" />
     <ClInclude Include="pureShape.h" />
     <ClInclude Include="segment.h" />
     <ClInclude Include="shape.h" />

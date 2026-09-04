@@ -23,7 +23,6 @@ using namespace std;
 template<bool isTriple>
 class Segment {
 public:
-	float2 vog[2][2 + isTriple];
 	float2 vc[2][2 + isTriple];
 	float2 vh[2][2 + isTriple];
 	float2 va[2][3 + isTriple];
@@ -35,8 +34,8 @@ public:
 	bool isVertsInTriple;
 	bool isVertsOutTriple;
 
-	Segment(float2 v[2 + isTriple], float2 vf[2 + isTriple], float* expressionsCoefficientsPtr, float* expressionsSelectionPtr, int& segmentsCompleted) {
-		expressionsSelectionPtr[segmentsCompleted] = 0.0f;
+	Segment(float2 v[2 + isTriple], float2 vf[2 + isTriple], float* expressionsCoefficientsPtr, float* expressionsSelectionsPtr, int& segmentsCompleted) {
+		expressionsSelectionsPtr[segmentsCompleted] = 0.0f;
 
 		// Straight case. // TODO: Can be copyed to const exp above.
 		if constexpr (not isTriple)
@@ -70,10 +69,7 @@ public:
 			}
 
 			// CONSTANT
-			expressionsSelectionPtr[segmentsCompleted] = 2.0f;
-			//expressionsSelectionPtr[0 + segmentsCompleted * 3] = false;
-			//expressionsSelectionPtr[1 + segmentsCompleted * 3] = false;
-			//expressionsSelectionPtr[2 + segmentsCompleted * 3] = true;
+			expressionsSelectionsPtr[segmentsCompleted] = 2.0f;
 
 			expressionsCoefficientsPtr[0 + segmentsCompleted * 10] = constX;
 			expressionsCoefficientsPtr[1 + segmentsCompleted * 10] = constY;
@@ -89,13 +85,6 @@ public:
 		else {
 			// Following Code is only for triple segments.
 
-			vog[0][0] = v[0];
-			vog[0][1] = v[1];
-			vog[0][2] = v[2];
-			vog[1][0] = vf[0];
-			vog[1][1] = vf[1];
-			vog[1][2] = vf[2];
-
 			float2 v12 = v[1] - v[0];
 			float2 v23 = v[2] - v[1];
 			float2 v13 = v[2] - v[0];
@@ -104,16 +93,17 @@ public:
 			pointsDefine(v, false);
 			pointsDefine(vf, true);
 
-			// TODO: reorder can be moved before pointsDefine
 			if (abs(v13.x) < abs(v12.x) * 0.05) reorder(1, 2, 3);
 			else if (abs(v12.x) < abs(v23.x) * 0.05) reorder(2, 1, 0);
 
-			float2 v1f1 = vog[1][0] - vog[0][0];
-			bool isFadingLeft = v12.cross(v23) > 0;
+			float2 v1f1 = vf[0] - v[0];
+			bool isFadingLeft = v12.cross(v1f1) > 0;
 
 			float cross_ = v12.cross(v23);
 			bool itTurnsLeft = cross_ > 0;
 			bool itTurnsRight = cross_ < 0;
+
+			cout << itTurnsLeft << " " << isFadingLeft << " " << itTurnsRight << " " << !isFadingLeft << endl;
 
 			// Curved case.
 			if (itTurnsLeft && isFadingLeft || itTurnsRight && !isFadingLeft)
@@ -210,20 +200,14 @@ public:
 				bool useFirstMember = abs(F1__) < abs(F2__);
 
 				// QUADRATIC
-				expressionsSelectionPtr[segmentsCompleted] = 1.0f;
-				//expressionsSelectionPtr[0 + segmentsCompleted * 3] = false;
-				//expressionsSelectionPtr[1 + segmentsCompleted * 3] = true;
-				//expressionsSelectionPtr[2 + segmentsCompleted * 3] = false;
+				expressionsSelectionsPtr[segmentsCompleted] = 1.0f;
 
 				expressionsCoefficientsPtr[8 + segmentsCompleted * 10] = a_m_2;
 				expressionsCoefficientsPtr[9 + segmentsCompleted * 10] = useFirstMember;
 			}
 			else {
 				// LINEAR
-				expressionsSelectionPtr[segmentsCompleted] = 3.0f;
-				//expressionsSelectionPtr[0 + segmentsCompleted * 3] = false;
-				//expressionsSelectionPtr[1 + segmentsCompleted * 3] = false;
-				//expressionsSelectionPtr[2 + segmentsCompleted * 3] = false;
+				expressionsSelectionsPtr[segmentsCompleted] = 3.0f;
 
 				expressionsCoefficientsPtr[8 + segmentsCompleted * 10] = 0.0f;
 				expressionsCoefficientsPtr[9 + segmentsCompleted * 10] = 0.0f;
@@ -233,14 +217,14 @@ public:
 	};
 
 private:
-	void reorder(const int order1, const int order2, const int order3) {
-		vc[0][0] = va[0][order1];
-		vc[0][1] = va[0][order2];
-		vc[0][2] = va[0][order3];
+	void reorder(const int order0, const int order1, const int order2) {
+		vc[0][0] = va[0][order0];
+		vc[0][1] = va[0][order1];
+		vc[0][2] = va[0][order2];
 
-		vc[1][0] = va[1][order1];
-		vc[1][1] = va[1][order2];
-		vc[1][2] = va[1][order3];
+		vc[1][0] = va[1][order0];
+		vc[1][1] = va[1][order1];
+		vc[1][2] = va[1][order2];
 
 		vh[0][0] = vc[0][1] + (vc[0][0] - vc[0][1]) / 2;
 		vh[0][1] = vc[0][1];

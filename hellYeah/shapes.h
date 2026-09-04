@@ -12,7 +12,7 @@ static const int shapeNoseVerticalSize = 2;
 
 static const float shapeNoseVerticalLayers[shapeNoseVerticalSize] = { static_cast<float>(0.0), static_cast<float>(1.0) };
 
-static shapeSizes shapeNoseShapeSizes = { .verts = 12, .lines = 16, .expressions = 4 };
+static shapeSizes shapeNoseShapeSizes = { .verts = 12, .lines = 16, .expressions = 4, .vertsPrev = 0, .linesPrev = 0, .expressionsPrev = 0 };
 static const int shapeNoseVertical0HorizontalSize = 2;
 
 static const float shapeNoseVertical0HorizontalLayers[shapeNoseVertical0HorizontalSize] = { static_cast<float>(0.0), static_cast<float>(1.0) };
@@ -89,7 +89,7 @@ static const int shapeWatVerticalSize = 1;
 
 static const float shapeWatVerticalLayers[shapeWatVerticalSize] = { static_cast<float>(0.5) };
 
-static shapeSizes shapeWatShapeSizes = { .verts = 12, .lines = 15, .expressions = 4 };
+static shapeSizes shapeWatShapeSizes = { .verts = 12, .lines = 15, .expressions = 4, .vertsPrev = 12, .linesPrev = 16, .expressionsPrev = 4 };
 static const int shapeWatVertical90HorizontalSize = 2;
 
 static const float shapeWatVertical90HorizontalLayers[shapeWatVertical90HorizontalSize] = { static_cast<float>(0.2222222222222222), static_cast<float>(0.3055555555555556) };

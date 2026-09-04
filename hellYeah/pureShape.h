@@ -28,6 +28,10 @@ struct shapeSizes {
 	int verts;
 	int lines;
 	int expressions;
+
+	int vertsPrev;
+	int linesPrev;
+	int expressionsPrev;
 };
 
 template<typename type>

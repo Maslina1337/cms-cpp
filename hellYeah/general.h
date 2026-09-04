@@ -35,5 +35,10 @@ namespace CMS {
 		float hAngle);
 
 	// angleVertical = [0-1 (means 0-180)]		angleHorizontal = [0-1 (means 0-360)]
-	void tick(float v, float h, float* expressionsCoefficientsPtr, float* expressionsSelectionsPtr);
+	void tick(
+		float v, float h,
+		float* vertsPtr, float* linesPtr,
+		float* expressionsCoefficientsPtr, float* expressionsSelectionsPtr,
+		float* opacityPerShapePtr, float* isSubtractPerShapePtr
+	);
 };

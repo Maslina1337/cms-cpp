@@ -40,10 +40,30 @@ class Shape {
 public:
 	PureShape sourcePureShape;
 
+	float* vertsPtr;
+	float* linesPtr;
+
+	int vertsSize;
+	int linesSize;
+	int expressionSize;
+	int vertsPrevSize;
+	int linesPrevSize;
+	int expressionPrevSize;
+
+	vector<float2> vertsIn;
+	vector<float2> vertsOut;
+
+	vector<lineSided> linesIn;
+	vector<lineSided> linesOut;
+	vector<lineSided> linesBetween;
+
 public:
-	Shape(PureShape ps, float* expressionsCoefficientsPtr, float* expressionsSelectionPtr, int& segmentsCompleted);
+	Shape(PureShape ps, float* vertsPtr, float* linesPtr, float* expressionsCoefficientsPtr, float* expressionsSelectionsPtr, int& segmentsCompleted);
 
 private:
+	void vertsPush(int offset, vector<float2>& verts);
+	void linesPush(int offset, vector<lineSided>& lines);
+
 	bool isVertOnLeftOfLine(const float2& lineVert1, const float2& lineVert2, const float2& sideVert) const;
 
 	bool isVertHigherThanLine(const float2& lineVert1, const float2& lineVert2, const float2& sideVert) const;

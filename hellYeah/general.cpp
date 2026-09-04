@@ -1,46 +1,16 @@
-//#include "pch.h"
 #include "general.h"
 
-//void CMSGetShapesSizes(int* shapesSize_, int* vertsSize_, int* linesSize_, int* expressionsSize_) {
-//	*shapesSize_ = shapesSize;
-//	*vertsSize_ = vertsSize;
-//	*linesSize_ = linesSize;
-//	*expressionsSize_ = expressionsSize;
-//};
-// void CMSGetPersonalShapesSizes(int* shapesSizes) {};
-void CMSTick(float v, float h, float* vertsPtr, float* linesPtr, float* expressionsCoefficientsPtr, float* expressionsSelectionsPtr) {
-	// Valid test.
-	//if (
-	//	expressionsSelectionsPtr == nullptr 
-	//	or expressionsCoefficientsPtr == nullptr 
-	//	or expressionsCoefficientsSize != (expressionsSize + 2) * 10
-	//	or expressionsSelectionsSize != (expressionsSize + 2)
-	//) return;
-
-	//expressionsSelectionsPtr[0] = true;
-	//expressionsSelectionsPtr[9] = true;
-	//return;
-	CMS::tick(v, h, expressionsCoefficientsPtr, expressionsSelectionsPtr);
+void CMSTick(
+	float v, float h, 
+	float* vertsPtr, float* linesPtr, 
+	float* expressionsCoefficientsPtr, float* expressionsSelectionsPtr,
+	float* opacityPerShapePtr, float* isSubtractPerShapePtr) {
+	CMS::tick(
+		v, h, 
+		vertsPtr, linesPtr, 
+		expressionsCoefficientsPtr, expressionsSelectionsPtr,
+		opacityPerShapePtr, isSubtractPerShapePtr);
 };
-
-//int main() {
-//	bool* expressionsSelectionsPtr = new bool[(expressionsSize + 2) * 3];
-//	float* expressionsCoefficientsPtr = new float[(expressionsSize + 2) * 10];
-//
-//	CMS::tick(0.5f, 0.5f, expressionsCoefficientsPtr, expressionsSelectionsPtr);
-//
-//	for (int i = 0; i < (expressionsSize + 2) * 10; i++) {
-//		if (i % 10 == 0) cout << endl;
-//		cout << expressionsCoefficientsPtr[i] << " ";
-//	}
-//
-//	for (int i = 0; i < (expressionsSize + 2) * 3; i++) {
-//		if (i % 3 == 0) cout << endl;
-//		cout << expressionsSelectionsPtr[i] << " ";
-//	}
-//
-//	return 0;
-//}
 
 namespace CMS {
 	void getNeighborsIndices(int& prevIndex, int& nextIndex, const float ofAngle, const float* inAngles, const int inAnglesSize, const bool isSeamless) {
@@ -127,35 +97,21 @@ namespace CMS {
 	}
 
 	// v = [0-1 (means 0-180)]		h = [0-1 (means 0-360)]
-	void tick(float v, float h, float* expressionsCoefficientsPtr, float* expressionsSelectionsPtr) {
-
+	void tick(
+		float v, float h, 
+		float* vertsPtr, float* linesPtr, 
+		float* expressionsCoefficientsPtr, float* expressionsSelectionsPtr,
+		float* opacityPerShapePtr, float* isSubtractPerShapePtr
+	) {
+		
 		// Raw Expressions.
 		for (int i = 0; i < 20; i++) expressionsCoefficientsPtr[i] = 0.0f;
 		expressionsCoefficientsPtr[10] = 1.0f;
 
 		expressionsSelectionsPtr[0] = 0;
 		expressionsSelectionsPtr[1] = 0;
-		//expressionsSelectionsPtr[0] = true;
-		//expressionsSelectionsPtr[1] = false;
-		//expressionsSelectionsPtr[2] = false;
-		//expressionsSelectionsPtr[3] = true;
-		//expressionsSelectionsPtr[4] = false;
-		//expressionsSelectionsPtr[5] = false;
-
-		//vector<float> expressionsCoefficients = { 
-		//	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
-		//	1, 0, 0, 0, 0, 0, 0, 0, 0, 0 
-		//};
-
-		//vector<bool> expressionsSelections = { 
-		//	true, false, false, 
-		//	true, false, false 
-		//};
 
 		int segmentsCompleted = 2;
-
-		//expressionsCoefficients.reserve((expressionsSize + 2) * 10);
-		//expressionsSelections.reserve((expressionsSize + 2) * 3);
 
 		for (int sIndex = 0; sIndex < shapesSize; sIndex++) {
 
@@ -196,7 +152,10 @@ namespace CMS {
 				h);
 			
 			if (verticalLayerAngles[nextIndexV] == verticalLayerAngles[prevIndexV]) {
-				Shape s(prevMergeH, expressionsCoefficientsPtr, expressionsSelectionsPtr, segmentsCompleted);
+				Shape s(prevMergeH, vertsPtr, linesPtr, expressionsCoefficientsPtr, expressionsSelectionsPtr, segmentsCompleted);
+
+				opacityPerShapePtr[sIndex] = prevMergeH.opacity;
+				isSubtractPerShapePtr[sIndex] = prevMergeH.isSubtract;
 			}
 			else {
 				PureShape nextMergeH = mergePureShapesHorizontally(
@@ -208,10 +167,11 @@ namespace CMS {
 
 				PureShape resultMerge = mergePureShapes(prevMergeH, nextMergeH, (v - verticalLayerAngles[prevIndexV]) /
 					(verticalLayerAngles[nextIndexV] - verticalLayerAngles[prevIndexV]));
-				Shape s(resultMerge, expressionsCoefficientsPtr, expressionsSelectionsPtr, segmentsCompleted);
-			}
+				Shape s(resultMerge, vertsPtr, linesPtr, expressionsCoefficientsPtr, expressionsSelectionsPtr, segmentsCompleted);
 
-			
+				opacityPerShapePtr[sIndex] = resultMerge.opacity;
+				isSubtractPerShapePtr[sIndex] = resultMerge.isSubtract;
+			}
 		}
 	}
 };
