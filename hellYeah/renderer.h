@@ -29,11 +29,12 @@ public:
 		this->isSubtractPerShapePtr = isSubtractPerShapePtr;
 	}
 
-	float render(float2 xy) {
+	float render(float2 xy, bool debug = false) {
 		float factor = 0.0f;
 
 		for (int sIndex = 0; sIndex < shapesSize; sIndex++) {
-			float shapeFactor;
+			if (debug) cout << "For Shape " << shapesNames[sIndex] << ":" << endl;
+			float shapeFactor = 0.0f;
 
 			float2 suitableLine[2] = { float2(1,0), float2(1,1) };
 			int suitableExpressionIndex = 0; // TODO: default index heere
@@ -56,12 +57,16 @@ public:
 				}
 			}
 
+			if (debug) cout << "Suitable line is " << suitableLine[0].getString() << ", " << suitableLine[1].getString() << endl;
+
 			if (expressionsSelectionsPtr[suitableExpressionIndex] == 0) {
 				// Raw
 				shapeFactor = expressionsCoefficientsPtr[suitableExpressionIndex * 10 + 0];
+				if (debug) cout << "Suitable line exp is raw." << endl;
 			}
 			else if (expressionsSelectionsPtr[suitableExpressionIndex] == 1) {
 				shapeFactor = quadraticExp(xy.x, xy.y, suitableExpressionIndex);
+				if (debug) cout << "Suitable line exp is raw." << endl;
 			}
 			else if (expressionsSelectionsPtr[suitableExpressionIndex] == 2) {
 				shapeFactor = constantExp(xy.x, xy.y, suitableExpressionIndex);
@@ -70,8 +75,11 @@ public:
 
 			shapeFactor = 1 - shapeFactor;
 			shapeFactor *= opacityPerShapePtr[sIndex];
+
+			const int exponent = 2;
+
 			float a = isSubtractPerShapePtr[sIndex] ? 1 - factor : factor;
-			float b = pow(clamp(static_cast<float>(pow(a, 2) + pow(shapeFactor, 2)), 0.0f, 1.0f), 1/2);
+			float b = pow(clamp(static_cast<float>(pow(a, exponent) + pow(shapeFactor, exponent)), 0.0f, 1.0f), 1/exponent);
 			factor = isSubtractPerShapePtr[sIndex] ? 1 - b : b;
 		}
 
