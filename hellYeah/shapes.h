@@ -92,35 +92,35 @@ static const float shapeWatVerticalLayers[shapeWatVerticalSize] = { static_cast<
 static shapeSizes shapeWatShapeSizes = { .verts = 12, .lines = 15, .expressions = 4, .vertsPrev = 12, .linesPrev = 16, .expressionsPrev = 4 };
 static const int shapeWatVertical90HorizontalSize = 2;
 
-static const float shapeWatVertical90HorizontalLayers[shapeWatVertical90HorizontalSize] = { static_cast<float>(0.2222222222222222), static_cast<float>(0.3055555555555556) };
+static const float shapeWatVertical90HorizontalLayers[shapeWatVertical90HorizontalSize] = { static_cast<float>(0.0), static_cast<float>(1.0) };
 
-static PureShape shapeWatVertical90Horizontal80PureShape = {
-        .locs = {float2(static_cast<float>(0.32247239351272583), static_cast<float>(0.4403236508369446)), float2(static_cast<float>(0.4403235912322998), static_cast<float>(0.3224724531173706))},
-        .locsMiddles = {float2(static_cast<float>(0.2635469436645508), static_cast<float>(0.3813980519771576)), float2(static_cast<float>(0.3813979923725128), static_cast<float>(0.3813980519771576)), float2(static_cast<float>(0.38139808177948), static_cast<float>(0.2635469138622284))},
-        .fadeoutScales = {static_cast<float>(3.000002816322089), static_cast<float>(2.999999966472392)},
+static PureShape shapeWatVertical90Horizontal0PureShape = {
+        .locs = {float2(static_cast<float>(0.2866116166114807), static_cast<float>(0.2794628143310547)), float2(static_cast<float>(0.4044627845287323), static_cast<float>(0.1616116464138031))},
+        .locsMiddles = {float2(static_cast<float>(0.22768613696098328), static_cast<float>(0.2205372303724289)), float2(static_cast<float>(0.3455371856689453), static_cast<float>(0.2205372303724289)), float2(static_cast<float>(0.3455372750759125), static_cast<float>(0.1026860922574997))},
+        .fadeoutScales = {static_cast<float>(3.000001832844834), static_cast<float>(2.999999966472392)},
         .isSubtract = false,
         .isCyclic = false,
         .doIgnore = false,
         .opacity = static_cast<float>(1.0),
-        .fadeoutAngle = static_cast<float>(2.356194220197019),
-        .fadeoutLength = static_cast<float>(0.1666666672875484),
+        .fadeoutAngle = static_cast<float>(2.3561939673160284),
+        .fadeoutLength = static_cast<float>(0.16666665611167716),
         .index = 1
 };
 
-static PureShape shapeWatVertical90Horizontal110PureShape = {
-        .locs = {float2(static_cast<float>(0.44032371044158936), static_cast<float>(0.6775274276733398)), float2(static_cast<float>(0.3224725127220154), static_cast<float>(0.5596763491630554))},
-        .locsMiddles = {float2(static_cast<float>(0.3813980519771576), static_cast<float>(0.7364530563354492)), float2(static_cast<float>(0.38139817118644714), static_cast<float>(0.61860191822052)), float2(static_cast<float>(0.263546884059906), static_cast<float>(0.6186019778251648))},
-        .fadeoutScales = {static_cast<float>(2.9999995194375813), static_cast<float>(2.9999997206039657)},
+static PureShape shapeWatVertical90Horizontal360PureShape = {
+        .locs = {float2(static_cast<float>(0.4044628143310547), static_cast<float>(0.8383883237838745)), float2(static_cast<float>(0.2866116464138031), static_cast<float>(0.7205371856689453))},
+        .locsMiddles = {float2(static_cast<float>(0.3455371558666229), static_cast<float>(0.8973139524459839)), float2(static_cast<float>(0.3455372750759125), static_cast<float>(0.7794628143310547)), float2(static_cast<float>(0.22768601775169373), static_cast<float>(0.7794628143310547))},
+        .fadeoutScales = {static_cast<float>(2.9999995194375813), static_cast<float>(3.0000005252647552)},
         .isSubtract = false,
         .isCyclic = false,
         .doIgnore = false,
         .opacity = static_cast<float>(1.0),
-        .fadeoutAngle = static_cast<float>(0.7853986019801082),
-        .fadeoutLength = static_cast<float>(0.16666669802119038),
+        .fadeoutAngle = static_cast<float>(0.78539809621802),
+        .fadeoutLength = static_cast<float>(0.16666667846341887),
         .index = 1
 };
 
-static PureShape* shapeWatVertical90HorizontalPureShapes[shapeWatVertical90HorizontalSize] = { &shapeWatVertical90Horizontal80PureShape, &shapeWatVertical90Horizontal110PureShape };
+static PureShape* shapeWatVertical90HorizontalPureShapes[shapeWatVertical90HorizontalSize] = { &shapeWatVertical90Horizontal0PureShape, &shapeWatVertical90Horizontal360PureShape };
 
 static PureShapeLayer<PureShape*> shapeWatVertical90HorizontalPureShapesWrapped = { .size = shapeWatVertical90HorizontalSize, .angles = shapeWatVertical90HorizontalLayers, .pureShapes = shapeWatVertical90HorizontalPureShapes };
 

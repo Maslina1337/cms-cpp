@@ -4,12 +4,12 @@ void CMSTick(
 	float v, float h, 
 	float* vertsPtr, float* linesPtr, 
 	float* expressionsCoefficientsPtr, float* expressionsSelectionsPtr,
-	float* opacityPerShapePtr, float* isSubtractPerShapePtr) {
+	float* opacityPerShapePtr, float* isSubtractPerShapePtr, float* borderPerShapePtr) {
 	CMS::tick(
 		v, h, 
 		vertsPtr, linesPtr, 
 		expressionsCoefficientsPtr, expressionsSelectionsPtr,
-		opacityPerShapePtr, isSubtractPerShapePtr);
+		opacityPerShapePtr, isSubtractPerShapePtr, borderPerShapePtr);
 };
 
 namespace CMS {
@@ -98,10 +98,11 @@ namespace CMS {
 
 	// v = [0-1 (means 0-180)]		h = [0-1 (means 0-360)]
 	void tick(
-		float v, float h, 
-		float* vertsPtr, float* linesPtr, 
+		float v, float h,
+		float* vertsPtr, float* linesPtr,
 		float* expressionsCoefficientsPtr, float* expressionsSelectionsPtr,
-		float* opacityPerShapePtr, float* isSubtractPerShapePtr
+		float* opacityPerShapePtr, float* isSubtractPerShapePtr, float* borderPerShapePtr,
+		bool debug
 	) {
 		
 		// Raw Expressions.
@@ -152,7 +153,7 @@ namespace CMS {
 				h);
 			
 			if (verticalLayerAngles[nextIndexV] == verticalLayerAngles[prevIndexV]) {
-				Shape s(prevMergeH, vertsPtr, linesPtr, expressionsCoefficientsPtr, expressionsSelectionsPtr, segmentsCompleted);
+				Shape s(prevMergeH, vertsPtr, linesPtr, expressionsCoefficientsPtr, expressionsSelectionsPtr, borderPerShapePtr, segmentsCompleted, debug);
 
 				opacityPerShapePtr[sIndex] = prevMergeH.opacity;
 				isSubtractPerShapePtr[sIndex] = prevMergeH.isSubtract;
@@ -167,11 +168,37 @@ namespace CMS {
 
 				PureShape resultMerge = mergePureShapes(prevMergeH, nextMergeH, (v - verticalLayerAngles[prevIndexV]) /
 					(verticalLayerAngles[nextIndexV] - verticalLayerAngles[prevIndexV]));
-				Shape s(resultMerge, vertsPtr, linesPtr, expressionsCoefficientsPtr, expressionsSelectionsPtr, segmentsCompleted);
+				Shape s(resultMerge, vertsPtr, linesPtr, expressionsCoefficientsPtr, expressionsSelectionsPtr, borderPerShapePtr, segmentsCompleted, debug);
 
 				opacityPerShapePtr[sIndex] = resultMerge.opacity;
 				isSubtractPerShapePtr[sIndex] = resultMerge.isSubtract;
 			}
+		}
+
+		if (debug) {
+			cout << "vertsPtr" << endl;
+			for (int i = 0; i < vertsSize; i++) {
+				int j = i * 2;
+				cout << i << ". (" << vertsPtr[j] << ", " << vertsPtr[j + 1] << ")" << endl;
+			}
+			cout << endl;
+
+			cout << "linesPtr" << endl;
+			for (int i = 0; i < linesSize; i++) {
+				int j = i * 3;
+				cout << i << ". " << linesPtr[j] << " " << linesPtr[j + 1] << " " << linesPtr[j + 2] << endl;
+			}
+			cout << endl;
+
+			//cout << "linesPtr" << endl;
+			//for (int i = 0; i < linesSize; i++) {
+			//	int j = i * 3;
+			//	cout << i << ". (" << linesPtr[j] << ", " << linesPtr[j + 1] << ")" << endl;
+			//}
+			//cout << endl;
+				//float* vertsPtr, float* linesPtr,
+				//float* expressionsCoefficientsPtr, float* expressionsSelectionsPtr,
+				//float* opacityPerShapePtr, float* isSubtractPerShapePtr,
 		}
 	}
 };

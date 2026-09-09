@@ -18,10 +18,6 @@ struct PureShape {
 	float fadeoutLength;
 
 	int index;
-
-	//const int* const vertsSizePtr;
-	//const int* const linesSizePtr;
-	//const int* const expressionSizePtr;
 };
 
 struct shapeSizes {

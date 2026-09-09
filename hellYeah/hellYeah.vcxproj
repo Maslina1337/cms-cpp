@@ -28,6 +28,7 @@
   <ItemGroup>
     <ClInclude Include="float2.h" />
     <ClInclude Include="general.h" />
+    <ClInclude Include="gif.h" />
     <ClInclude Include="lodepng.h" />
     <ClInclude Include="pureShape.h" />
     <ClInclude Include="segment.h" />

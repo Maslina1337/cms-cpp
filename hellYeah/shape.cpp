@@ -1,6 +1,6 @@
 #include "shape.h"
 
-Shape::Shape(PureShape ps, float* vertsPtr, float* linesPtr, float* expressionsCoefficientsPtr, float* expressionsSelectionsPtr, int& segmentsCompleted) {
+Shape::Shape(PureShape ps, float* vertsPtr, float* linesPtr, float* expressionsCoefficientsPtr, float* expressionsSelectionsPtr, float* borderPerShapePtr, int& segmentsCompleted, bool debug) {
 	sourcePureShape = ps;
 
 	this->vertsPtr = vertsPtr;
@@ -41,28 +41,32 @@ Shape::Shape(PureShape ps, float* vertsPtr, float* linesPtr, float* expressionsC
 		};
 	}
 
-	cout << endl << "LOCS" << endl;
-	for (int i = 0; i < ps.locs.size(); i++) {
-		cout << ps.locs[i].getString() << endl;
-	}
-	cout << endl << "LOCS MIDDLES" << endl;
-	for (int i = 0; i < ps.locsMiddles.size(); i++) {
-		cout << ps.locsMiddles[i].getString() << endl;
-	}
+	if (debug) {
+		cout << "For shape " << shapesNames[ps.index] << endl; 
+		cout << endl << "LOCS" << endl;
+		for (int i = 0; i < ps.locs.size(); i++) {
+			cout << ps.locs[i].getString() << endl;
+		}
+		cout << endl << "LOCS MIDDLES" << endl;
+		for (int i = 0; i < ps.locsMiddles.size(); i++) {
+			cout << ps.locsMiddles[i].getString() << endl;
+		}
 
-	cout << endl << "FADEOUT" << endl;
-	for (int i = 0; i < locsSize; i++) {
-		cout << locsFadeout[i].getString() << endl;
-	}
+		cout << endl << "FADEOUT" << endl;
+		for (int i = 0; i < locsSize; i++) {
+			cout << locsFadeout[i].getString() << endl;
+		}
 
-	cout << endl << "FADEOUT MIDDLE" << endl;
-	for (int i = 0; i < locsMiddlesSize; i++) {
-		cout << locsMiddlesFadeout[i].getString() << endl;
+		cout << endl << "FADEOUT MIDDLE" << endl;
+		for (int i = 0; i < locsMiddlesSize; i++) {
+			cout << locsMiddlesFadeout[i].getString() << endl;
+		}
 	}
 
 	float leftestVertX;
 
-	bool defaultExpressionIndex = 0;
+	// The behaviour may be unexpected if start and end is equal.
+	border rightBorder = { .bottom = 0.f, .top = 1.f, .expressionIndex = 0 };
 
 	// First segment.
 	if (not ps.isCyclic) {
@@ -73,8 +77,8 @@ Shape::Shape(PureShape ps, float* vertsPtr, float* linesPtr, float* expressionsC
 		vertsIn.push_back(s.vertsIn[0]);
 		vertsOut.push_back(s.vertsOut[0]);
 
-		lineDefine(s.vertsIn[1], &vertsIn, linesIn, s.vertsOut[1], VERT_TYPE::IN, 2, 1, leftestVertX, defaultExpressionIndex);
-		lineDefine(s.vertsOut[1], &vertsOut, linesOut, s.vertsIn[1], VERT_TYPE::OUT, 2, 0, leftestVertX, defaultExpressionIndex);
+		lineDefine(s.vertsIn[1], &vertsIn, linesIn, s.vertsOut[1], VERT_TYPE::IN, 2, 0, leftestVertX, rightBorder.expressionIndex);
+		lineDefine(s.vertsOut[1], &vertsOut, linesOut, s.vertsIn[1], VERT_TYPE::OUT, 2, 1, leftestVertX, rightBorder.expressionIndex);
 		lineBetweenDefine(vertsIn.size() - 2, vertsOut.size() - 2, &vertsIn, &vertsOut, linesBetween, s.vertsIn[1], 2, locsSize + 1);
 		lineBetweenDefine(vertsIn.size() - 1, vertsOut.size() - 1, &vertsIn, &vertsOut, linesBetween, s.vertsIn[0], 2, 3);
 	}
@@ -86,11 +90,11 @@ Shape::Shape(PureShape ps, float* vertsPtr, float* linesPtr, float* expressionsC
 		Segment<true> s(v, vf, expressionsCoefficientsPtr, expressionsSelectionsPtr, segmentsCompleted);
 
 		// Defining lines.
-		lineDefine(s.vertsIn[1], &vertsIn, linesIn, s.vertsOut[1], VERT_TYPE::IN, arcIndex + 2, 0, leftestVertX, defaultExpressionIndex);
-		if (s.isVertsInTriple) lineDefine(s.vertsIn[2], &vertsIn, linesIn, s.vertsOut[0], VERT_TYPE::IN, arcIndex + 2, 0, leftestVertX, defaultExpressionIndex);
+		lineDefine(s.vertsIn[1], &vertsIn, linesIn, s.vertsOut[1], VERT_TYPE::IN, arcIndex + 2, 1, leftestVertX, rightBorder.expressionIndex);
+		if (s.isVertsInTriple) lineDefine(s.vertsIn[2], &vertsIn, linesIn, s.vertsOut[0], VERT_TYPE::IN, arcIndex + 2, 1, leftestVertX, rightBorder.expressionIndex);
 		
-		lineDefine(s.vertsOut[1], &vertsOut, linesOut, s.vertsIn[1], VERT_TYPE::OUT, arcIndex + 2, 1, leftestVertX, defaultExpressionIndex);
-		if (s.isVertsOutTriple) lineDefine(s.vertsOut[2], &vertsOut, linesOut, s.vertsIn[0], VERT_TYPE::OUT, arcIndex + 2, 1, leftestVertX, defaultExpressionIndex);
+		lineDefine(s.vertsOut[1], &vertsOut, linesOut, s.vertsIn[1], VERT_TYPE::OUT, arcIndex + 2, 0, leftestVertX, rightBorder.expressionIndex);
+		if (s.isVertsOutTriple) lineDefine(s.vertsOut[2], &vertsOut, linesOut, s.vertsIn[0], VERT_TYPE::OUT, arcIndex + 2, 0, leftestVertX, rightBorder.expressionIndex);
 
 		lineBetweenDefine(vertsIn.size() - 1, vertsOut.size() - 1, &vertsIn, &vertsOut, linesBetween,
 			(s.isVertsInTriple ? s.vertsIn : s.vertsOut)[1],
@@ -103,8 +107,8 @@ Shape::Shape(PureShape ps, float* vertsPtr, float* linesPtr, float* expressionsC
 		float2 vf[2] = { locsMiddlesFadeout[locsMiddlesSize - 1], (locsMiddlesFadeout[locsMiddlesSize - 1] - locsFadeout[locsSize - 1]).getNormalized() * 2 + locsFadeout[locsSize - 1] };
 		Segment<false> s(v, vf, expressionsCoefficientsPtr, expressionsSelectionsPtr, segmentsCompleted);
 
-		lineDefine(s.vertsIn[1], &vertsIn, linesIn, s.vertsOut[1], VERT_TYPE::IN, locsSize + 3, 0, leftestVertX, defaultExpressionIndex);
-		lineDefine(s.vertsOut[1], &vertsOut, linesOut, s.vertsIn[1], VERT_TYPE::OUT, locsSize + 3, 1, leftestVertX, defaultExpressionIndex);
+		lineDefine(s.vertsIn[1], &vertsIn, linesIn, s.vertsOut[1], VERT_TYPE::IN, locsSize + 3, 1, leftestVertX, rightBorder.expressionIndex);
+		lineDefine(s.vertsOut[1], &vertsOut, linesOut, s.vertsIn[1], VERT_TYPE::OUT, locsSize + 3, 0, leftestVertX, rightBorder.expressionIndex);
 		lineBetweenDefine(vertsIn.size() - 1, vertsOut.size() - 1, &vertsIn, &vertsOut, linesBetween, s.vertsIn[0], locsSize + 3, locsSize + 2);
 	}
 
@@ -112,9 +116,49 @@ Shape::Shape(PureShape ps, float* vertsPtr, float* linesPtr, float* expressionsC
 		// Fixing the wrong index of first added lines.
 		 linesIn[0].from = static_cast<int>(vertsIn.size()) - 1;
 		 linesOut[0].from = static_cast<int>(vertsOut.size()) - 1;
+	}
+	else {
+		//float2 eIn00 = vertsIn[0];
+		//float2 eIn01 = vertsIn[1];
 
-		// Flipping default. TODO: Discover why it's flipped.
-		defaultExpressionIndex = 1 - defaultExpressionIndex;
+		//float2 eIn10 = vertsIn[vertsIn.size() - 1];
+		//float2 eIn11 = vertsIn[vertsIn.size() - 2];
+
+		//float2 eIn0 = eIn00 - eIn01;
+		//float2 eIn1 = eIn10 - eIn11;
+
+		//// Is both ends intersect the right wall?
+		//if (eIn0.x > 0 and eIn1.x > 0) {
+		//	float2 eOut00 = vertsOut[0];
+		//	float2 eOut01 = vertsOut[1];
+
+		//	float2 eOut10 = vertsOut[vertsOut.size() - 1];
+		//	float2 eOut11 = vertsOut[vertsOut.size() - 2];
+
+		//	float2 eOut0 = eOut00 - eOut01;
+		//	float2 eOut1 = eOut10 - eOut11;
+
+		//	float2 eIn0Intersect = float2::getIntersectionPoint(eIn00, eIn01, float2(1, 0), float2(1, 1));
+		//	float2 eIn1Intersect = float2::getIntersectionPoint(eIn10, eIn11, float2(1, 0), float2(1, 1));
+
+		//	float2 eOut0Intersect = float2::getIntersectionPoint(eOut00, eOut01, float2(1, 0), float2(1, 1));
+		//	float2 eOut1Intersect = float2::getIntersectionPoint(eOut10, eOut11, float2(1, 0), float2(1, 1));
+
+		//	// Is IN intersects closer to each other than the OUT intersects
+		//	if ((eIn0Intersect - eIn1Intersect).getLength() < (eOut0Intersect - eOut1Intersect).getLength()) {
+		//		rightBorder.start = eIn0Intersect.y;
+		//		rightBorder.end = eIn1Intersect.y;
+		//		rightBorder.expressionIndex = 1;
+		//	}
+		//	else {
+		//		rightBorder.start = eOut0Intersect.y;
+		//		rightBorder.end = eOut1Intersect.y;
+		//		rightBorder.expressionIndex = 0;
+		//	}
+		//}
+		//else if (eIn0.x > 0) {
+		//	
+		//}
 	}
 
 	if (vertsIn.size() + vertsOut.size() != vertsSize) { cout << "PIZDA V " << vertsIn.size() << " " << vertsOut.size() << " " << vertsSize << endl; return; }
@@ -128,6 +172,11 @@ Shape::Shape(PureShape ps, float* vertsPtr, float* linesPtr, float* expressionsC
 	linesPush(0, linesIn);
 	linesPush(linesIn.size(), linesOut);
 	linesPush(linesIn.size() + linesOut.size(), linesBetween);
+
+	borderPerShapePtr[ps.index * 3 + 0] = rightBorder.bottom;
+	borderPerShapePtr[ps.index * 3 + 1] = rightBorder.top;
+	borderPerShapePtr[ps.index * 3 + 2] = rightBorder.expressionIndex;
+	
 };
 
 void Shape::vertsPush(int offset, vector<float2>& verts) {
@@ -141,19 +190,23 @@ void Shape::vertsPush(int offset, vector<float2>& verts) {
 void Shape::linesPush(int offset, vector<lineSided>& lines) {
 	for (int i = 0; i < lines.size(); i++) {
 		int j = (linesPrevSize + offset + i) * 3;
-		linesPtr[j] = lines[i].from + (lines[i].fromType == VERT_TYPE::OUT) * static_cast<int>(vertsIn.size()) + vertsPrevSize;
-		linesPtr[j + 1] = lines[i].to + (lines[i].toType == VERT_TYPE::OUT) * static_cast<int>(vertsIn.size()) + vertsPrevSize;
+
+		const int vertFromIndex = lines[i].from + (lines[i].fromType == VERT_TYPE::OUT) * static_cast<int>(vertsIn.size()) + vertsPrevSize;
+		const int vertToIndex = lines[i].to + (lines[i].toType == VERT_TYPE::OUT) * static_cast<int>(vertsIn.size()) + vertsPrevSize;
+		
+		linesPtr[j] = vertFromIndex;
+		linesPtr[j + 1] = vertToIndex;
 		linesPtr[j + 2] = getProperExp(
-			vertsPtr[static_cast<int>(linesPtr[j])],
-			vertsPtr[static_cast<int>(linesPtr[j + 1])],
+			float2(vertsPtr[vertFromIndex * 2], vertsPtr[vertFromIndex * 2 + 1]),
+			float2(vertsPtr[vertToIndex * 2], vertsPtr[vertToIndex * 2 + 1]),
 			lines[i].sideVert, lines[i].expressionIndexFit, lines[i].expressionIndexOtherwise
 		) + expressionPrevSize;
 	}
 }
 
 bool Shape::isVertOnLeftOfLine(const float2& lineVert1, const float2& lineVert2, const float2& sideVert) const {
-	float2 fromTo = lineVert1.x < lineVert2.x ? lineVert2 - lineVert1 : lineVert1 - lineVert2;
-	if (fromTo.y > 0.00001) {
+	float2 fromTo = (lineVert1.x < lineVert2.x) ? lineVert2 - lineVert1 : lineVert1 - lineVert2;
+	if (fromTo.y > .00001f) {
 		const float ctan = fromTo.x / fromTo.y;
 		const float mustLayX = ctan * (sideVert.y - lineVert1.y) + lineVert1.x;
 		return sideVert.x < mustLayX;
@@ -162,15 +215,15 @@ bool Shape::isVertOnLeftOfLine(const float2& lineVert1, const float2& lineVert2,
 }
 
 
-bool Shape::isVertHigherThanLine(const float2& lineVert1, const float2& lineVert2, const float2& sideVert) const {
-	float2 fromTo = lineVert1.x < lineVert2.x ? lineVert2 - lineVert1 : lineVert1 - lineVert2;
-	if (fromTo.x > 0.00001) {
-		const float tan = fromTo.y / fromTo.x;
-		const float mustLayY = tan * (sideVert.x - lineVert1.x) + lineVert1.y;
-		return sideVert.y > mustLayY;
-	}
-	else return sideVert.y > lineVert1.y;
-}
+//bool Shape::isVertHigherThanLine(const float2& lineVert1, const float2& lineVert2, const float2& sideVert) const {
+//	float2 fromTo = (lineVert1.x < lineVert2.x) ? lineVert2 - lineVert1 : lineVert1 - lineVert2;
+//	if (fromTo.x > .00001f) {
+//		const float tan = fromTo.y / fromTo.x;
+//		const float mustLayY = tan * (sideVert.x - lineVert1.x) + lineVert1.y;
+//		return sideVert.y > mustLayY;
+//	}
+//	else return sideVert.y > lineVert1.y;
+//}
 
 
 int Shape::getProperExp(const float2& lineVert1, const float2& lineVert2, const float2& sideVert, const int expressionIndexFit, const int expressionIndexOtherwise) {
@@ -186,7 +239,7 @@ void Shape::lineDefine(
 	int expressionIndexFit,
 	int expressionIndexOtherwise,
 	float& leftestVertX,
-	bool& defaultExpressionIndex
+	bool& borderOutsideExpressionIndex
 ) {
 	int vertsSize = vertsPtr->size();
 
@@ -206,7 +259,7 @@ void Shape::lineDefine(
 
 	if (vert2.x < leftestVertX) {
 		leftestVertX = vert2.x;
-		defaultExpressionIndex = vertType == VERT_TYPE::IN ? 1 : 0;
+		borderOutsideExpressionIndex = vertType == VERT_TYPE::IN ? 1 : 0;
 	}
 
 	lines.push_back(newLine);

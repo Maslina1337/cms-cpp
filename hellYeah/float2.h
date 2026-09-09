@@ -68,6 +68,21 @@ public:
         return "(" + to_string(this->x) + ", " + to_string(this->y) + ")";
     }
 
+    static float2 getIntersectionPoint(float2 from1, float2 to1, float2 from2, float2 to2) {
+        float2 d1 = to1 - from1;
+        float t1 = d1.y / d1.x;
+
+        float2 d2 = to2 - from2;
+        float t2 = d2.y / d2.x;
+        
+        float2 intersection;
+        intersection.x = (from2.x - from1.x) / (t1 - t2);
+        intersection.y = t1 * intersection.x + from1.x;
+
+        return intersection;
+    }
+        
+
     //friend std::ostream& operator<<(std::ostream& os, float2* v);
 };
 

@@ -15,7 +15,10 @@
 extern "C" {
 	// void DLL_EXPORT CMSGetShapesSizes(int* shapesSize, int* vertsSize, int* linesSize, int* expressionsSize);
 	// void DLL_EXPORT CMSGetPersonalShapesSizes(int* shapesSizes);
-	void DLL_EXPORT CMSTick(float v, float h, float* vertsPtr, float* linesPtr, float* expressionsCoefficientsPtr, float* expressionsSelectionsPtr);
+	void DLL_EXPORT CMSTick(float v, float h, 
+		float* vertsPtr, float* linesPtr, 
+		float* expressionsCoefficientsPtr, float* expressionsSelectionsPtr, 
+		float* opacityPerShapePtr, float* isSubtractPerShapePtr, float* borderPerShapePtr);
 }
 
 #endif
@@ -39,6 +42,7 @@ namespace CMS {
 		float v, float h,
 		float* vertsPtr, float* linesPtr,
 		float* expressionsCoefficientsPtr, float* expressionsSelectionsPtr,
-		float* opacityPerShapePtr, float* isSubtractPerShapePtr
+		float* opacityPerShapePtr, float* isSubtractPerShapePtr, float* borderPerShapePtr,
+		bool debug = false
 	);
 };

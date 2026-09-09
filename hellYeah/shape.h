@@ -29,13 +29,18 @@ struct lineSided {
 	int expressionIndexOtherwise = 0; // Index of expression if the check is on negative side. 
 };
 
-struct lineExpressioned { 
-	int from;
-	int to;
-	int expressionIndex;
+struct border {
+	float bottom;
+	float top;
+	bool expressionIndex;
 };
 
-//template<bool isCyclic> // Size - is a number of arcs. (Except the ends when is not cyclic)
+//struct lineExpressioned { 
+//	int from;
+//	int to;
+//	int expressionIndex;
+//};
+
 class Shape {
 public:
 	PureShape sourcePureShape;
@@ -58,7 +63,7 @@ public:
 	vector<lineSided> linesBetween;
 
 public:
-	Shape(PureShape ps, float* vertsPtr, float* linesPtr, float* expressionsCoefficientsPtr, float* expressionsSelectionsPtr, int& segmentsCompleted);
+	Shape(PureShape ps, float* vertsPtr, float* linesPtr, float* expressionsCoefficientsPtr, float* expressionsSelectionsPtr, float* borderPerShapePtr, int& segmentsCompleted, bool debug = false);
 
 private:
 	void vertsPush(int offset, vector<float2>& verts);
@@ -66,7 +71,7 @@ private:
 
 	bool isVertOnLeftOfLine(const float2& lineVert1, const float2& lineVert2, const float2& sideVert) const;
 
-	bool isVertHigherThanLine(const float2& lineVert1, const float2& lineVert2, const float2& sideVert) const;
+	//bool isVertHigherThanLine(const float2& lineVert1, const float2& lineVert2, const float2& sideVert) const;
 
 	int getProperExp(const float2& lineVert1, const float2& lineVert2, const float2& sideVert, const int expressionIndexFit, const int expressionIndexOtherwise);
 
