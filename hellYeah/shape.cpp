@@ -77,10 +77,10 @@ Shape::Shape(PureShape ps, float* vertsPtr, float* linesPtr, float* expressionsC
 		vertsIn.push_back(s.vertsIn[0]);
 		vertsOut.push_back(s.vertsOut[0]);
 
-		lineDefine(s.vertsIn[1], &vertsIn, linesIn, s.vertsOut[1], VERT_TYPE::IN, 2, 1, leftestVertX, rightBorder.expressionIndex);
-		lineDefine(s.vertsOut[1], &vertsOut, linesOut, s.vertsIn[1], VERT_TYPE::OUT, 2, 0, leftestVertX, rightBorder.expressionIndex);
-		lineBetweenDefine(vertsIn.size() - 2, vertsOut.size() - 2, &vertsIn, &vertsOut, linesBetween, s.vertsIn[1], 2, locsSize + 1);
-		lineBetweenDefine(vertsIn.size() - 1, vertsOut.size() - 1, &vertsIn, &vertsOut, linesBetween, s.vertsIn[0], 2, 3);
+		lineDefine(s.vertsIn[1], &vertsIn, linesIn, s.vertsOut[1], VERT_TYPE::IN, 2 + expressionPrevSize, 1, leftestVertX, rightBorder.expressionIndex);
+		lineDefine(s.vertsOut[1], &vertsOut, linesOut, s.vertsIn[1], VERT_TYPE::OUT, 2 + expressionPrevSize, 0, leftestVertX, rightBorder.expressionIndex);
+		lineBetweenDefine(vertsIn.size() - 2, vertsOut.size() - 2, &vertsIn, &vertsOut, linesBetween, s.vertsIn[1], 2 + expressionPrevSize, locsSize + 1 + expressionPrevSize);
+		lineBetweenDefine(vertsIn.size() - 1, vertsOut.size() - 1, &vertsIn, &vertsOut, linesBetween, s.vertsIn[0], 2 + expressionPrevSize, 3 + expressionPrevSize);
 	}
 	// Arc segments
 	for (int arcIndex = not ps.isCyclic; arcIndex < locsSize + (not ps.isCyclic); arcIndex++) {
@@ -90,15 +90,15 @@ Shape::Shape(PureShape ps, float* vertsPtr, float* linesPtr, float* expressionsC
 		Segment<true> s(v, vf, expressionsCoefficientsPtr, expressionsSelectionsPtr, segmentsCompleted);
 
 		// Defining lines.
-		lineDefine(s.vertsIn[1], &vertsIn, linesIn, s.vertsOut[1], VERT_TYPE::IN, arcIndex + 2, 1, leftestVertX, rightBorder.expressionIndex);
-		if (s.isVertsInTriple) lineDefine(s.vertsIn[2], &vertsIn, linesIn, s.vertsOut[0], VERT_TYPE::IN, arcIndex + 2, 1, leftestVertX, rightBorder.expressionIndex);
+		lineDefine(s.vertsIn[1], &vertsIn, linesIn, s.vertsOut[1], VERT_TYPE::IN, arcIndex + 2 + expressionPrevSize, 1, leftestVertX, rightBorder.expressionIndex);
+		if (s.isVertsInTriple) lineDefine(s.vertsIn[2], &vertsIn, linesIn, s.vertsOut[0], VERT_TYPE::IN, arcIndex + 2 + expressionPrevSize, 1, leftestVertX, rightBorder.expressionIndex);
 		
-		lineDefine(s.vertsOut[1], &vertsOut, linesOut, s.vertsIn[1], VERT_TYPE::OUT, arcIndex + 2, 0, leftestVertX, rightBorder.expressionIndex);
-		if (s.isVertsOutTriple) lineDefine(s.vertsOut[2], &vertsOut, linesOut, s.vertsIn[0], VERT_TYPE::OUT, arcIndex + 2, 0, leftestVertX, rightBorder.expressionIndex);
+		lineDefine(s.vertsOut[1], &vertsOut, linesOut, s.vertsIn[1], VERT_TYPE::OUT, arcIndex + 2 + expressionPrevSize, 0, leftestVertX, rightBorder.expressionIndex);
+		if (s.isVertsOutTriple) lineDefine(s.vertsOut[2], &vertsOut, linesOut, s.vertsIn[0], VERT_TYPE::OUT, arcIndex + 2 + expressionPrevSize, 0, leftestVertX, rightBorder.expressionIndex);
 
 		lineBetweenDefine(vertsIn.size() - 1, vertsOut.size() - 1, &vertsIn, &vertsOut, linesBetween,
 			(s.isVertsInTriple ? s.vertsIn : s.vertsOut)[1],
-			arcIndex + 2, arcIndex + 3);
+			arcIndex + 2 + expressionPrevSize, arcIndex + 3 + expressionPrevSize);
 	}
 
 	// Last segment.
@@ -107,9 +107,9 @@ Shape::Shape(PureShape ps, float* vertsPtr, float* linesPtr, float* expressionsC
 		float2 vf[2] = { locsMiddlesFadeout[locsMiddlesSize - 1], (locsMiddlesFadeout[locsMiddlesSize - 1] - locsFadeout[locsSize - 1]).getNormalized() * 2 + locsFadeout[locsSize - 1] };
 		Segment<false> s(v, vf, expressionsCoefficientsPtr, expressionsSelectionsPtr, segmentsCompleted);
 
-		lineDefine(s.vertsIn[1], &vertsIn, linesIn, s.vertsOut[1], VERT_TYPE::IN, locsSize + 3, 1, leftestVertX, rightBorder.expressionIndex);
-		lineDefine(s.vertsOut[1], &vertsOut, linesOut, s.vertsIn[1], VERT_TYPE::OUT, locsSize + 3, 0, leftestVertX, rightBorder.expressionIndex);
-		lineBetweenDefine(vertsIn.size() - 1, vertsOut.size() - 1, &vertsIn, &vertsOut, linesBetween, s.vertsIn[0], locsSize + 3, locsSize + 2);
+		lineDefine(s.vertsIn[1], &vertsIn, linesIn, s.vertsOut[1], VERT_TYPE::IN, locsSize + 3 + expressionPrevSize, 1, leftestVertX, rightBorder.expressionIndex);
+		lineDefine(s.vertsOut[1], &vertsOut, linesOut, s.vertsIn[1], VERT_TYPE::OUT, locsSize + 3 + expressionPrevSize, 0, leftestVertX, rightBorder.expressionIndex);
+		lineBetweenDefine(vertsIn.size() - 1, vertsOut.size() - 1, &vertsIn, &vertsOut, linesBetween, s.vertsIn[0], locsSize + 3 + expressionPrevSize, locsSize + 2 + expressionPrevSize);
 	}
 
 	if (ps.isCyclic) {
@@ -205,7 +205,7 @@ void Shape::linesPush(int offset, vector<lineSided>& lines) {
 			float2(vertsPtr[vertFromIndex * 2], vertsPtr[vertFromIndex * 2 + 1]),
 			float2(vertsPtr[vertToIndex * 2], vertsPtr[vertToIndex * 2 + 1]),
 			lines[i].sideVert, lines[i].expressionIndexFit, lines[i].expressionIndexOtherwise
-		) + expressionPrevSize;
+		);
 
 		cout << " RESULT: " << linesPtr[j + 2] << endl;
 	}

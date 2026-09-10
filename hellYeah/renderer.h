@@ -58,8 +58,11 @@ public:
 				if (debug) cout << "exp: " << expIndex << endl;
 
 				bool shouldReplace =
-					isIntersectsLineOnRight(vf, vt, xy) and
-					isline1IntersectsLine2OnLeftUnsafe(suitableLine[0], suitableLine[1], vf, vt);
+					isIntersectsLineOnRight(vf, vt, xy) and 
+					(
+					!isAnyLineSuitable or
+					isline1IntersectsLine2OnLeftUnsafe(suitableLine[0], suitableLine[1], vf, vt)
+					);
 
 				if (debug) cout << "Should Replace: " << shouldReplace << endl;
 				if (debug) cout << "Is point " << xy.getString()
@@ -268,16 +271,16 @@ int main() {
 	float* isSubtractPerShapePtr = new float[shapesSize];
 	float* borderPerShapePtr = new float[shapesSize * 3];
 
-	const bool doPNG = 1;
-	const bool doAnimation = 0;
+	const bool doPNG = 0;
+	const bool doAnimation = 1;
 	const bool doRenderPoint = 1; 
 	//const float2 testRenderPoint(0.0f, 0.0f); // 0
 	//const float2 testRenderPoint (0.5f, 0.5f); // 1
-	//const float2 testRenderPoint(0.f, 0.f); // custom
-	const float2 testRenderPoint((-1.81541f + 3.f) / 6.f, (2.89771f + 3.f) / 6.f); // blender export
+	//const float2 testRenderPoint(1.f, 1.f); // custom
+	const float2 testRenderPoint((2.12983f + 3.f) / 6.f, (2.08524f + 3.f) / 6.f); // blender export
 	const bool debug = true; // Print additional info in console.
 
-	CMS::tick(0.9f, 0.9f, vertsPtr, linesPtr, expressionsCoefficientsPtr, expressionsSelectionsPtr, opacityPerShapePtr, isSubtractPerShapePtr, borderPerShapePtr, debug);
+	CMS::tick(1.f, 1.f, vertsPtr, linesPtr, expressionsCoefficientsPtr, expressionsSelectionsPtr, opacityPerShapePtr, isSubtractPerShapePtr, borderPerShapePtr, debug);
 
 	Renderer renderer(vertsPtr, linesPtr, expressionsCoefficientsPtr, expressionsSelectionsPtr, opacityPerShapePtr, isSubtractPerShapePtr, borderPerShapePtr);
 	if (doPNG) {
@@ -288,7 +291,7 @@ int main() {
 
 	if (doAnimation) {
 		const int size = 512;
-		saveAnimation(renderer, size, 0, 1, 0, 1, 20, 5);
+		saveAnimation(renderer, size, 0, 1, 0, 1, 30, 5);
 		cout << "GIF saved on desktop." << endl;
 	}
 
