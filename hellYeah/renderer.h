@@ -269,14 +269,15 @@ int main() {
 	float* borderPerShapePtr = new float[shapesSize * 3];
 
 	const bool doPNG = 0;
-	const bool doAnimation = 1;
-	const bool doRenderPoint = 0;
+	const bool doAnimation = 0;
+	const bool doRenderPoint = 1; 
 	//const float2 testRenderPoint(0.0f, 0.0f); // 0
 	//const float2 testRenderPoint (0.5f, 0.5f); // 1
-	const float2 testRenderPoint(1.f - .5f / 3.f * 2.f, .5f + .5f / 3.f); // q
+	//const float2 testRenderPoint(1.f - .5f / 3.f * 2.f, .5f + .5f / 3.f); // q
+	const float2 testRenderPoint(( - 2.37485f + 3.f) / 6.f, (1.54345f + 3.f) / 6.f); // custom
 	const bool debug = true; // Print additional info in console.
 
-	CMS::tick(0.7f, 0.7f, vertsPtr, linesPtr, expressionsCoefficientsPtr, expressionsSelectionsPtr, opacityPerShapePtr, isSubtractPerShapePtr, borderPerShapePtr, debug);
+	CMS::tick(0.0f, 0.0f, vertsPtr, linesPtr, expressionsCoefficientsPtr, expressionsSelectionsPtr, opacityPerShapePtr, isSubtractPerShapePtr, borderPerShapePtr, debug);
 
 	Renderer renderer(vertsPtr, linesPtr, expressionsCoefficientsPtr, expressionsSelectionsPtr, opacityPerShapePtr, isSubtractPerShapePtr, borderPerShapePtr);
 	if (doPNG) {
