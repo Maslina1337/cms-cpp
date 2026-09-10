@@ -128,7 +128,7 @@ public:
 
 		if (debug) cout << endl << endl;
 
-		const float exponent = 1;
+		const float exponent = 3;
 		factor = pow(factor, exponent);
 
 		return factor;
@@ -222,7 +222,7 @@ void fillImageBuffer(Renderer& renderer, vector<uint8_t>& buffer, int size) {
 		{
 			float renderResult = renderer.render(float2(
 				static_cast<float>(j) / static_cast<float>(size),
-				static_cast<float>(i) / static_cast<float>(size)
+				1 - static_cast<float>(i) / static_cast<float>(size) // reversing 'coz image buffer has coordinate origin at bottom right corner.
 			));
 			buffer.push_back(renderResult * 255.f);
 			buffer.push_back(renderResult * 255.f);
@@ -268,16 +268,16 @@ int main() {
 	float* isSubtractPerShapePtr = new float[shapesSize];
 	float* borderPerShapePtr = new float[shapesSize * 3];
 
-	const bool doPNG = 0;
+	const bool doPNG = 1;
 	const bool doAnimation = 0;
 	const bool doRenderPoint = 1; 
 	//const float2 testRenderPoint(0.0f, 0.0f); // 0
 	//const float2 testRenderPoint (0.5f, 0.5f); // 1
-	//const float2 testRenderPoint(1.f - .5f / 3.f * 2.f, .5f + .5f / 3.f); // q
-	const float2 testRenderPoint(( - 2.37485f + 3.f) / 6.f, (1.54345f + 3.f) / 6.f); // custom
+	//const float2 testRenderPoint(0.f, 0.f); // custom
+	const float2 testRenderPoint((-1.81541f + 3.f) / 6.f, (2.89771f + 3.f) / 6.f); // blender export
 	const bool debug = true; // Print additional info in console.
 
-	CMS::tick(0.0f, 0.0f, vertsPtr, linesPtr, expressionsCoefficientsPtr, expressionsSelectionsPtr, opacityPerShapePtr, isSubtractPerShapePtr, borderPerShapePtr, debug);
+	CMS::tick(0.9f, 0.9f, vertsPtr, linesPtr, expressionsCoefficientsPtr, expressionsSelectionsPtr, opacityPerShapePtr, isSubtractPerShapePtr, borderPerShapePtr, debug);
 
 	Renderer renderer(vertsPtr, linesPtr, expressionsCoefficientsPtr, expressionsSelectionsPtr, opacityPerShapePtr, isSubtractPerShapePtr, borderPerShapePtr);
 	if (doPNG) {
@@ -288,7 +288,7 @@ int main() {
 
 	if (doAnimation) {
 		const int size = 512;
-		saveAnimation(renderer, size, 0, 1, 0, 1, 20, 10);
+		saveAnimation(renderer, size, 0, 1, 0, 1, 20, 5);
 		cout << "GIF saved on desktop." << endl;
 	}
 

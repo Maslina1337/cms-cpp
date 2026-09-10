@@ -55,9 +55,9 @@ public:
 				float ctan = (v[1].x - v[0].x) / (v[1].y - v[0].y);
 				float a = ctan * (v[0].y - vf[0].y) + vf[0].x - v[0].x;
 
-				constScalar = (ctan * v[0].x - v[0].y) / a;
-				constX = -ctan / a;
-				constY = 1 / a;
+				constScalar = (ctan * v[0].y - v[0].x) / a;
+				constX = 1 / a;
+				constY = - ctan / a;
 			}
 			else { // Horizontal case.
 				float tan = (v[1].y - v[0].y) / (v[1].x - v[0].x);

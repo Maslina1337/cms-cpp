@@ -190,15 +190,34 @@ namespace CMS {
 			}
 			cout << endl;
 
-			//cout << "linesPtr" << endl;
-			//for (int i = 0; i < linesSize; i++) {
-			//	int j = i * 3;
-			//	cout << i << ". (" << linesPtr[j] << ", " << linesPtr[j + 1] << ")" << endl;
-			//}
-			//cout << endl;
-				//float* vertsPtr, float* linesPtr,
-				//float* expressionsCoefficientsPtr, float* expressionsSelectionsPtr,
-				//float* opacityPerShapePtr, float* isSubtractPerShapePtr,
+			cout << "LINES" << endl;
+			for (int i = 0; i < linesSize; i++) {
+				int j = i * 3;
+				float2 vFrom (vertsPtr[static_cast<int>(linesPtr[j + 0]) * 2 + 0], vertsPtr[static_cast<int>(linesPtr[j + 0]) * 2 + 1]);
+				float2 vTo (vertsPtr[static_cast<int>(linesPtr[j + 1]) * 2 + 0], vertsPtr[static_cast<int>(linesPtr[j + 1]) * 2 + 1]);
+				string expType;
+				int expIndex = static_cast<int>(linesPtr[j + 2]);
+				switch (static_cast<int>(expressionsSelectionsPtr[expIndex])) {
+				case 0:
+					expType = "RAW";
+					break;
+				case 1:
+					expType = "QUADRATIC";
+					break;
+				case 2:
+					expType = "CONSTANT";
+					break;
+				case 3:
+					expType = "LINEAR";
+				}
+
+				cout << i << ". " << vFrom.getString() << " " << vTo.getString() << " " << expType << " (" << expIndex << ") {";
+				for (int k = 0; k < 10; k++) {
+					cout << expressionsCoefficientsPtr[expIndex * 10 + k] << ", ";
+				}
+				cout << "}" << endl;
+			}
+			cout << endl;
 		}
 	}
 };

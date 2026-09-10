@@ -77,8 +77,8 @@ Shape::Shape(PureShape ps, float* vertsPtr, float* linesPtr, float* expressionsC
 		vertsIn.push_back(s.vertsIn[0]);
 		vertsOut.push_back(s.vertsOut[0]);
 
-		lineDefine(s.vertsIn[1], &vertsIn, linesIn, s.vertsOut[1], VERT_TYPE::IN, 2, 0, leftestVertX, rightBorder.expressionIndex);
-		lineDefine(s.vertsOut[1], &vertsOut, linesOut, s.vertsIn[1], VERT_TYPE::OUT, 2, 1, leftestVertX, rightBorder.expressionIndex);
+		lineDefine(s.vertsIn[1], &vertsIn, linesIn, s.vertsOut[1], VERT_TYPE::IN, 2, 1, leftestVertX, rightBorder.expressionIndex);
+		lineDefine(s.vertsOut[1], &vertsOut, linesOut, s.vertsIn[1], VERT_TYPE::OUT, 2, 0, leftestVertX, rightBorder.expressionIndex);
 		lineBetweenDefine(vertsIn.size() - 2, vertsOut.size() - 2, &vertsIn, &vertsOut, linesBetween, s.vertsIn[1], 2, locsSize + 1);
 		lineBetweenDefine(vertsIn.size() - 1, vertsOut.size() - 1, &vertsIn, &vertsOut, linesBetween, s.vertsIn[0], 2, 3);
 	}
@@ -194,19 +194,26 @@ void Shape::linesPush(int offset, vector<lineSided>& lines) {
 		const int vertFromIndex = lines[i].from + (lines[i].fromType == VERT_TYPE::OUT) * static_cast<int>(vertsIn.size()) + vertsPrevSize;
 		const int vertToIndex = lines[i].to + (lines[i].toType == VERT_TYPE::OUT) * static_cast<int>(vertsIn.size()) + vertsPrevSize;
 		
+		cout << "LINE PUSH ";
+
 		linesPtr[j] = vertFromIndex;
 		linesPtr[j + 1] = vertToIndex;
+		cout << float2(vertsPtr[vertFromIndex * 2], vertsPtr[vertFromIndex * 2 + 1]).getString() << " " <<
+			float2(vertsPtr[vertToIndex * 2], vertsPtr[vertToIndex * 2 + 1]).getString() << " " << lines[i].sideVert.getString() <<
+			lines[i].expressionIndexFit << " " << lines[i].expressionIndexOtherwise;
 		linesPtr[j + 2] = getProperExp(
 			float2(vertsPtr[vertFromIndex * 2], vertsPtr[vertFromIndex * 2 + 1]),
 			float2(vertsPtr[vertToIndex * 2], vertsPtr[vertToIndex * 2 + 1]),
 			lines[i].sideVert, lines[i].expressionIndexFit, lines[i].expressionIndexOtherwise
 		) + expressionPrevSize;
+
+		cout << " RESULT: " << linesPtr[j + 2] << endl;
 	}
 }
 
 bool Shape::isVertOnLeftOfLine(const float2& lineVert1, const float2& lineVert2, const float2& sideVert) const {
 	float2 fromTo = (lineVert1.x < lineVert2.x) ? lineVert2 - lineVert1 : lineVert1 - lineVert2;
-	if (fromTo.y > .00001f) {
+	if (abs(fromTo.y) > .00001f) {
 		const float ctan = fromTo.x / fromTo.y;
 		const float mustLayX = ctan * (sideVert.y - lineVert1.y) + lineVert1.x;
 		return sideVert.x < mustLayX;
