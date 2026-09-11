@@ -11,11 +11,13 @@ struct PureShape {
 
 	bool isSubtract;
 	bool isCyclic;
-	bool doIgnore;
+	// bool doIgnore; // Unused for now.
 
 	float opacity;
 	float fadeoutAngle;
 	float fadeoutLength;
+
+	float2 fadeoutShift; // Exists just in case.
 
 	int index;
 };

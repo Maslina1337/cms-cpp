@@ -69,12 +69,20 @@ namespace CMS {
 		// Bools.
 		fromPureShape.isSubtract = factor < 0.5 ? fromPureShape.isSubtract : toPureShape.isSubtract;
 		fromPureShape.isCyclic = factor < 0.5 ? fromPureShape.isCyclic : toPureShape.isCyclic;
-		fromPureShape.doIgnore = fromPureShape.doIgnore or toPureShape.doIgnore;
+		// fromPureShape.doIgnore = fromPureShape.doIgnore or toPureShape.doIgnore;
 
 		// Floats.
 		fromPureShape.opacity += (toPureShape.opacity - fromPureShape.opacity) * factor;
-		fromPureShape.fadeoutAngle += (toPureShape.fadeoutAngle - fromPureShape.fadeoutAngle) * factor;
 		fromPureShape.fadeoutLength += (toPureShape.fadeoutLength - fromPureShape.fadeoutLength) * factor;
+		fromPureShape.fadeoutShift += (toPureShape.fadeoutShift - fromPureShape.fadeoutShift) * factor;
+
+		// Fadeout Angle.
+		float d1 = toPureShape.fadeoutAngle - fromPureShape.fadeoutAngle; // angle add for clockwise case.
+		float d2 = -(2 * numbers::pi - d1); // angle add for non-clockwise case.
+		float d = abs(d1) < abs(d2) ? d1 : d2;
+
+		fromPureShape.fadeoutAngle += d * factor;
+
 
 		return fromPureShape;
 	}

@@ -133,58 +133,70 @@ Shape::Shape(PureShape ps, float* vertsPtr, float* linesPtr, float* expressionsC
 		float2 eOut10 = vertsOut[vertsOut.size() - 1];
 		float2 eOut11 = vertsOut[vertsOut.size() - 2];
 
-		float2 eOut0 = eOut00 - eOut01;
-		float2 eOut1 = eOut10 - eOut11;
+		// float2 eOut0 = eOut00 - eOut01;
+		// float2 eOut1 = eOut10 - eOut11;
 
-		float2 eIn0Intersect = float2::getIntersectionPoint(eIn00, eIn01, float2(1, 0), float2(1, 1));
-		float2 eIn1Intersect = float2::getIntersectionPoint(eIn10, eIn11, float2(1, 0), float2(1, 1));
+		float2 eIn0Intersect = float2::getIntersectionPoint(eIn00, eIn01, float2(1.f, 0.f), float2(1.f, 1.f));
+		float2 eIn1Intersect = float2::getIntersectionPoint(eIn10, eIn11, float2(1.f, 0.f), float2(1.f, 1.f));
 
-		float2 eOut0Intersect = float2::getIntersectionPoint(eOut00, eOut01, float2(1, 0), float2(1, 1));
-		float2 eOut1Intersect = float2::getIntersectionPoint(eOut10, eOut11, float2(1, 0), float2(1, 1));
+		float2 eOut0Intersect = float2::getIntersectionPoint(eOut00, eOut01, float2(1.f, 0.f), float2(1.f, 1.f));
+		float2 eOut1Intersect = float2::getIntersectionPoint(eOut10, eOut11, float2(1.f, 0.f), float2(1.f, 1.f));
+
+		cout << "A? " << eOut0Intersect.getString() << " " << eOut00.getString() << " " << eOut01.getString() << endl;
 
 		// Is end 0 intersect the right wall?
-		if (eIn0.x > 0) {
+		if (eIn0.x > 0.f) {
 			// Is end 1 intersect the right wall?
-			if (eIn1.x > 0) {
+			if (eIn1.x > 0.f) {
 				// Is IN intersects closer to each other than the OUT intersects
 				if ((eIn0Intersect - eIn1Intersect).getLength() < (eOut0Intersect - eOut1Intersect).getLength()) {
+					//cout << "AAA1" << endl;
 					rightBorder.bottom = min(eIn0Intersect.y, eIn1Intersect.y);
 					rightBorder.top = max(eIn0Intersect.y, eIn1Intersect.y);
 					rightBorder.expressionIndex = 1;
 				}
 				else {
+					//cout << "AAA2" << endl;
 					rightBorder.bottom = min(eOut0Intersect.y, eOut1Intersect.y);
 					rightBorder.top = max(eOut0Intersect.y, eOut1Intersect.y);
 					rightBorder.expressionIndex = 0;
 				}
 			}
 			else {
-				rightBorder.top = 1.f;
 				if (eIn0Intersect.y > eOut0Intersect.y) {
-					rightBorder.bottom = eIn0Intersect.y;
+					//cout << "AAA3" << endl;
+					rightBorder.top = max(2.f, eIn0Intersect.y);
+					rightBorder.bottom = min(2.f, eIn0Intersect.y);
 					rightBorder.expressionIndex = 1;
 				}
 				else {
-					rightBorder.bottom = eOut0Intersect.y;
+					//cout << "AAA4" << endl;
+					rightBorder.top = max(2.f, eOut0Intersect.y);
+					rightBorder.bottom = min(2.f, eOut0Intersect.y);
 					rightBorder.expressionIndex = 0;
 				}
 			}
 		}
 		else {
 			// Is end 1 intersect the right wall?
-			if (eIn1.x > 0) {
-				rightBorder.top = 1.f;
+			if (eIn1.x > 0.f) {
 				if (eIn1Intersect.y > eOut1Intersect.y) {
-					rightBorder.bottom = eIn1Intersect.y;
+					//cout << "AAA5" << endl;
+					rightBorder.top = max(2.f, eIn1Intersect.y);
+					rightBorder.bottom = min(2.f, eIn1Intersect.y);
 					rightBorder.expressionIndex = 1;
 				}
 				else {
-					rightBorder.bottom = eOut1Intersect.y;
+					//cout << "AAA6" << endl;
+					rightBorder.top = max(2.f, eOut1Intersect.y);
+					rightBorder.bottom = min(2.f, eOut1Intersect.y);
 					rightBorder.expressionIndex = 0;
 				}
 			}
 		}
 	}
+
+	cout << endl << "BORDER: " << rightBorder.bottom << " " << rightBorder.top << " " << rightBorder.expressionIndex << endl;
 
 	if (vertsIn.size() + vertsOut.size() != vertsSize) { cout << "PIZDA V " << vertsIn.size() << " " << vertsOut.size() << " " << vertsSize << endl; return; }
 	if (linesIn.size() + linesOut.size() + linesBetween.size() != linesSize) { cout << "PIZDA L " << linesIn.size() << " " << linesOut.size() << " " << linesBetween.size() << " " << linesSize << endl; return; }
@@ -218,21 +230,14 @@ void Shape::linesPush(int offset, vector<lineSided>& lines) {
 
 		const int vertFromIndex = lines[i].from + (lines[i].fromType == VERT_TYPE::OUT) * static_cast<int>(vertsIn.size()) + vertsPrevSize;
 		const int vertToIndex = lines[i].to + (lines[i].toType == VERT_TYPE::OUT) * static_cast<int>(vertsIn.size()) + vertsPrevSize;
-		
-		cout << "LINE PUSH ";
 
 		linesPtr[j] = vertFromIndex;
 		linesPtr[j + 1] = vertToIndex;
-		cout << float2(vertsPtr[vertFromIndex * 2], vertsPtr[vertFromIndex * 2 + 1]).getString() << " " <<
-			float2(vertsPtr[vertToIndex * 2], vertsPtr[vertToIndex * 2 + 1]).getString() << " " << lines[i].sideVert.getString() <<
-			lines[i].expressionIndexFit << " " << lines[i].expressionIndexOtherwise;
 		linesPtr[j + 2] = getProperExp(
 			float2(vertsPtr[vertFromIndex * 2], vertsPtr[vertFromIndex * 2 + 1]),
 			float2(vertsPtr[vertToIndex * 2], vertsPtr[vertToIndex * 2 + 1]),
 			lines[i].sideVert, lines[i].expressionIndexFit, lines[i].expressionIndexOtherwise
 		);
-
-		cout << " RESULT: " << linesPtr[j + 2] << endl;
 	}
 }
 

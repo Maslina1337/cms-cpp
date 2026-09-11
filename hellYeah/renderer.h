@@ -41,7 +41,7 @@ public:
 			if (debug) cout << "For Shape " << shapesNames[sIndex] << ":" << endl;
 			float shapeFactor = 0.0f;
 
-			float2 suitableLine[2] = { float2(1,0), float2(1,1) };
+			float2 suitableLine[2] = { float2(1,-1), float2(1,2) }; // Y in theory can be equal to 0 and 1, but for safety reasons we take -1 and 2
 			int suitableExpressionIndex = not borderPerShapePtr[sIndex * 3 + 2]; // Expression outside the border.
 			bool isAnyLineSuitable = false;
 
@@ -61,7 +61,7 @@ public:
 					isIntersectsLineOnRight(vf, vt, xy) and 
 					(
 					!isAnyLineSuitable or
-					isline1IntersectsLine2OnLeftUnsafe(suitableLine[0], suitableLine[1], vf, vt)
+					isline1IntersectsLine2OnLeft(suitableLine[0], suitableLine[1], vf, vt)
 					);
 
 				if (debug) cout << "Should Replace: " << shouldReplace << endl;
@@ -70,7 +70,7 @@ public:
 					<< isIntersectsLineOnRight(vf, vt, xy) << endl;
 				if (debug) cout << "Is line " << suitableLine[0].getString() << ", " << suitableLine[1].getString() 
 					<< " intersects line " << vf.getString() << ", " << vt.getString() << " on left: "
-					<< isline1IntersectsLine2OnLeftUnsafe(suitableLine[0], suitableLine[1], vf, vt) << endl;
+					<< isline1IntersectsLine2OnLeft(suitableLine[0], suitableLine[1], vf, vt) << endl;
 
 				if (shouldReplace) {
 					suitableLine[0] = vf;
@@ -139,6 +139,7 @@ public:
 
 	bool isIntersectsLineOnRight(float2 l1, float2 l2, float2 p) {
 		return 
+			!((l1.x == p.x) and (l1.y == p.y)) and !((l2.x == p.x) and (l2.y == p.y)) and
 			(l1.y != l2.y) and 
 			((l2.y <= p.y) and 
 			(l1.y >= p.y) or 
@@ -149,6 +150,7 @@ public:
 
 	bool isIntersectsLineOnLeft(float2 l1, float2 l2, float2 p) {
 		return
+			!((l1.x == p.x) and (l1.y == p.y)) and !((l2.x == p.x) and (l2.y == p.y)) and
 			(l1.y != l2.y) and
 			((l2.y <= p.y) and
 			(l1.y >= p.y) or
@@ -158,7 +160,7 @@ public:
 	}
 
 
-	bool isline1IntersectsLine2OnLeftUnsafe(float2 vf1, float2 vt1, float2 vf2, float2 vt2) {
+	bool isline1IntersectsLine2OnLeft(float2 vf1, float2 vt1, float2 vf2, float2 vt2) {
 		return
 			isIntersectsLineOnRight(vf1, vt1, vf2) or
 			isIntersectsLineOnRight(vf1, vt1, vt2) or
@@ -277,10 +279,10 @@ int main() {
 	//const float2 testRenderPoint(0.0f, 0.0f); // 0
 	//const float2 testRenderPoint (0.5f, 0.5f); // 1
 	//const float2 testRenderPoint(1.f, 1.f); // custom
-	const float2 testRenderPoint((2.12983f + 3.f) / 6.f, (2.08524f + 3.f) / 6.f); // blender export
+	const float2 testRenderPoint((-2.58469f + 3.f) / 6.f, (0.309966f + 3.f) / 6.f); // blender export
 	const bool debug = true; // Print additional info in console.
 
-	CMS::tick(1.f, 1.f, vertsPtr, linesPtr, expressionsCoefficientsPtr, expressionsSelectionsPtr, opacityPerShapePtr, isSubtractPerShapePtr, borderPerShapePtr, debug);
+	CMS::tick(0.f, 2.f/3.f + 1.f/30.f, vertsPtr, linesPtr, expressionsCoefficientsPtr, expressionsSelectionsPtr, opacityPerShapePtr, isSubtractPerShapePtr, borderPerShapePtr, debug);
 
 	Renderer renderer(vertsPtr, linesPtr, expressionsCoefficientsPtr, expressionsSelectionsPtr, opacityPerShapePtr, isSubtractPerShapePtr, borderPerShapePtr);
 	if (doPNG) {

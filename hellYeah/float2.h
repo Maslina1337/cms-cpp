@@ -40,6 +40,14 @@ public:
         return *this;
     }
 
+    bool operator==(const float2& v) {
+        return (x == v.x) and (y == v.y);
+    }
+
+    bool operator!=(const float2& v) {
+        return (x != v.x) and (y != v.y);
+    }
+
     float cross(const float2& v) const {
         return x * v.y - y * v.x;
     }
@@ -70,14 +78,58 @@ public:
 
     static float2 getIntersectionPoint(float2 from1, float2 to1, float2 from2, float2 to2) {
         float2 d1 = to1 - from1;
-        float t1 = d1.y / d1.x;
-
         float2 d2 = to2 - from2;
-        float t2 = d2.y / d2.x;
-        
+
         float2 intersection;
-        intersection.x = (from2.x - from1.x) / (t1 - t2);
-        intersection.y = t1 * intersection.x + from1.x;
+
+        if (d1.x > d1.y) {
+            // Using tan for d1.
+            float t1 = d1.y / d1.x;
+
+            if (d2.x > d2.y) {
+                // Using tan for d2. (Using tan for d1.)
+                float t2 = d2.y / d2.x;
+
+                //cout << "J1" << endl << from1.getString() << endl << to1.getString() << endl << from2.getString() << endl << to2.getString() << endl << endl;
+
+                intersection.x = (t2 * from2.x - from2.y - t1 * from1.x + from1.y) / (t2 - t1);
+                intersection.y = t1 * (intersection.x - from1.x) + from1.y;
+            }
+            else {
+                // Using ctan for d2. (Using tan for d1.)
+                float c2 = d2.x / d2.y;
+
+                //cout << "J2" << endl << from1.getString() << endl << to1.getString() << endl << from2.getString() << endl << to2.getString() << endl << endl;
+
+                intersection.x = (c2 * (t1 * from1.x - from1.y + from2.y) - from2.x) / (c2 * t1 - 1);
+                intersection.y = t1 * (intersection.x - from1.x) + from1.y;
+            }
+        }
+        else {
+            // Using ctan for d1.
+            float c1 = d1.x / d1.y;
+            
+            if (d2.x > d2.y) {
+                // Using tan for d2. (Using ctan for d1)
+                float t2 = d2.y / d2.x;
+
+                //cout << "J3" << endl << from1.getString() << endl << to1.getString() << endl << from2.getString() << endl << to2.getString() << endl << endl;
+
+                intersection.x = (c1 * (t2 * from2.x - from2.y + from1.y) - from1.x) / (c1 * t2 - 1);
+                intersection.y = t2 * (intersection.x - from2.x) + from2.y;
+            }
+            else {
+                // Using ctan for d2. (Using ctan for d1)
+                float c2 = d2.x / d2.y;
+
+                //cout << "J4" << endl << from1.getString() << endl << to1.getString() << endl << from2.getString() << endl << to2.getString() << endl << endl;
+
+                intersection.y = (c2 * from2.y - from2.x - c1 * from1.y + from1.x) / (c2 - c1);
+                intersection.x = c1 * (intersection.y - from1.y) + from1.x;
+            }
+        }
+
+        //cout << intersection.getString() << endl << endl;
 
         return intersection;
     }
