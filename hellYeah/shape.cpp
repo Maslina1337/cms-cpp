@@ -113,52 +113,77 @@ Shape::Shape(PureShape ps, float* vertsPtr, float* linesPtr, float* expressionsC
 	}
 
 	if (ps.isCyclic) {
-		// Fixing the wrong index of first added lines.
+		// Fixing the negative index of first added lines.
 		 linesIn[0].from = static_cast<int>(vertsIn.size()) - 1;
 		 linesOut[0].from = static_cast<int>(vertsOut.size()) - 1;
 	}
 	else {
-		//float2 eIn00 = vertsIn[0];
-		//float2 eIn01 = vertsIn[1];
+		float2 eIn00 = vertsIn[0];
+		float2 eIn01 = vertsIn[1];
 
-		//float2 eIn10 = vertsIn[vertsIn.size() - 1];
-		//float2 eIn11 = vertsIn[vertsIn.size() - 2];
+		float2 eIn10 = vertsIn[vertsIn.size() - 1];
+		float2 eIn11 = vertsIn[vertsIn.size() - 2];
 
-		//float2 eIn0 = eIn00 - eIn01;
-		//float2 eIn1 = eIn10 - eIn11;
+		float2 eIn0 = eIn00 - eIn01;
+		float2 eIn1 = eIn10 - eIn11;
 
-		//// Is both ends intersect the right wall?
-		//if (eIn0.x > 0 and eIn1.x > 0) {
-		//	float2 eOut00 = vertsOut[0];
-		//	float2 eOut01 = vertsOut[1];
+		float2 eOut00 = vertsOut[0];
+		float2 eOut01 = vertsOut[1];
 
-		//	float2 eOut10 = vertsOut[vertsOut.size() - 1];
-		//	float2 eOut11 = vertsOut[vertsOut.size() - 2];
+		float2 eOut10 = vertsOut[vertsOut.size() - 1];
+		float2 eOut11 = vertsOut[vertsOut.size() - 2];
 
-		//	float2 eOut0 = eOut00 - eOut01;
-		//	float2 eOut1 = eOut10 - eOut11;
+		float2 eOut0 = eOut00 - eOut01;
+		float2 eOut1 = eOut10 - eOut11;
 
-		//	float2 eIn0Intersect = float2::getIntersectionPoint(eIn00, eIn01, float2(1, 0), float2(1, 1));
-		//	float2 eIn1Intersect = float2::getIntersectionPoint(eIn10, eIn11, float2(1, 0), float2(1, 1));
+		float2 eIn0Intersect = float2::getIntersectionPoint(eIn00, eIn01, float2(1, 0), float2(1, 1));
+		float2 eIn1Intersect = float2::getIntersectionPoint(eIn10, eIn11, float2(1, 0), float2(1, 1));
 
-		//	float2 eOut0Intersect = float2::getIntersectionPoint(eOut00, eOut01, float2(1, 0), float2(1, 1));
-		//	float2 eOut1Intersect = float2::getIntersectionPoint(eOut10, eOut11, float2(1, 0), float2(1, 1));
+		float2 eOut0Intersect = float2::getIntersectionPoint(eOut00, eOut01, float2(1, 0), float2(1, 1));
+		float2 eOut1Intersect = float2::getIntersectionPoint(eOut10, eOut11, float2(1, 0), float2(1, 1));
 
-		//	// Is IN intersects closer to each other than the OUT intersects
-		//	if ((eIn0Intersect - eIn1Intersect).getLength() < (eOut0Intersect - eOut1Intersect).getLength()) {
-		//		rightBorder.start = eIn0Intersect.y;
-		//		rightBorder.end = eIn1Intersect.y;
-		//		rightBorder.expressionIndex = 1;
-		//	}
-		//	else {
-		//		rightBorder.start = eOut0Intersect.y;
-		//		rightBorder.end = eOut1Intersect.y;
-		//		rightBorder.expressionIndex = 0;
-		//	}
-		//}
-		//else if (eIn0.x > 0) {
-		//	
-		//}
+		// Is end 0 intersect the right wall?
+		if (eIn0.x > 0) {
+			// Is end 1 intersect the right wall?
+			if (eIn1.x > 0) {
+				// Is IN intersects closer to each other than the OUT intersects
+				if ((eIn0Intersect - eIn1Intersect).getLength() < (eOut0Intersect - eOut1Intersect).getLength()) {
+					rightBorder.bottom = min(eIn0Intersect.y, eIn1Intersect.y);
+					rightBorder.top = max(eIn0Intersect.y, eIn1Intersect.y);
+					rightBorder.expressionIndex = 1;
+				}
+				else {
+					rightBorder.bottom = min(eOut0Intersect.y, eOut1Intersect.y);
+					rightBorder.top = max(eOut0Intersect.y, eOut1Intersect.y);
+					rightBorder.expressionIndex = 0;
+				}
+			}
+			else {
+				rightBorder.top = 1.f;
+				if (eIn0Intersect.y > eOut0Intersect.y) {
+					rightBorder.bottom = eIn0Intersect.y;
+					rightBorder.expressionIndex = 1;
+				}
+				else {
+					rightBorder.bottom = eOut0Intersect.y;
+					rightBorder.expressionIndex = 0;
+				}
+			}
+		}
+		else {
+			// Is end 1 intersect the right wall?
+			if (eIn1.x > 0) {
+				rightBorder.top = 1.f;
+				if (eIn1Intersect.y > eOut1Intersect.y) {
+					rightBorder.bottom = eIn1Intersect.y;
+					rightBorder.expressionIndex = 1;
+				}
+				else {
+					rightBorder.bottom = eOut1Intersect.y;
+					rightBorder.expressionIndex = 0;
+				}
+			}
+		}
 	}
 
 	if (vertsIn.size() + vertsOut.size() != vertsSize) { cout << "PIZDA V " << vertsIn.size() << " " << vertsOut.size() << " " << vertsSize << endl; return; }
