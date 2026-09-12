@@ -1,6 +1,6 @@
 #include "general.h"
+
 #include "lodepng.h"
-//#include <cstdint>
 #include "gif.h"
 
 #include <cmath>
