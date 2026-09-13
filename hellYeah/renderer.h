@@ -273,8 +273,8 @@ int main() {
 	float* isSubtractPerShapePtr = new float[shapesSize];
 	float* borderPerShapePtr = new float[shapesSize * 3];
 
-	const bool doPNG = 0;
-	const bool doAnimation = 1;
+	const bool doPNG = 1;
+	const bool doAnimation = 0;
 	const bool doRenderPoint = 1; 
 	//const float2 testRenderPoint(0.0f, 0.0f); // 0
 	//const float2 testRenderPoint (0.5f, 0.5f); // 1

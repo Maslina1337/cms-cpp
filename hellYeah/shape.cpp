@@ -150,13 +150,11 @@ Shape::Shape(PureShape ps, float* vertsPtr, float* linesPtr, float* expressionsC
 			if (eIn1.x > 0.f) {
 				// Is IN intersects closer to each other than the OUT intersects
 				if ((eIn0Intersect - eIn1Intersect).getLength() < (eOut0Intersect - eOut1Intersect).getLength()) {
-					//cout << "AAA1" << endl;
 					rightBorder.bottom = min(eIn0Intersect.y, eIn1Intersect.y);
 					rightBorder.top = max(eIn0Intersect.y, eIn1Intersect.y);
 					rightBorder.expressionIndex = 1;
 				}
 				else {
-					//cout << "AAA2" << endl;
 					rightBorder.bottom = min(eOut0Intersect.y, eOut1Intersect.y);
 					rightBorder.top = max(eOut0Intersect.y, eOut1Intersect.y);
 					rightBorder.expressionIndex = 0;
@@ -164,13 +162,11 @@ Shape::Shape(PureShape ps, float* vertsPtr, float* linesPtr, float* expressionsC
 			}
 			else {
 				if (eIn0Intersect.y > eOut0Intersect.y) {
-					//cout << "AAA3" << endl;
 					rightBorder.top = max(2.f, eIn0Intersect.y);
 					rightBorder.bottom = min(2.f, eIn0Intersect.y);
 					rightBorder.expressionIndex = 1;
 				}
 				else {
-					//cout << "AAA4" << endl;
 					rightBorder.top = max(2.f, eOut0Intersect.y);
 					rightBorder.bottom = min(2.f, eOut0Intersect.y);
 					rightBorder.expressionIndex = 0;
@@ -181,13 +177,11 @@ Shape::Shape(PureShape ps, float* vertsPtr, float* linesPtr, float* expressionsC
 			// Is end 1 intersect the right wall?
 			if (eIn1.x > 0.f) {
 				if (eIn1Intersect.y > eOut1Intersect.y) {
-					//cout << "AAA5" << endl;
 					rightBorder.top = max(2.f, eIn1Intersect.y);
 					rightBorder.bottom = min(2.f, eIn1Intersect.y);
 					rightBorder.expressionIndex = 1;
 				}
 				else {
-					//cout << "AAA6" << endl;
 					rightBorder.top = max(2.f, eOut1Intersect.y);
 					rightBorder.bottom = min(2.f, eOut1Intersect.y);
 					rightBorder.expressionIndex = 0;
